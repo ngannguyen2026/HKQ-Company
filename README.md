@@ -2,7 +2,7 @@
 
 Trang chủ giới thiệu Công ty Bảo Hân Quân và các ứng dụng do Bảo Hân Quân phát triển & vận hành (ví dụ: [Thiên Minh Dịch](https://thienminhdich.com)).
 
-Xây dựng bằng [Astro](https://astro.build), xuất ra site tĩnh — deploy được lên Vercel, Netlify, Cloudflare Pages…
+Xây dựng bằng [Astro](https://astro.build), xuất ra site tĩnh. Production: **https://bhqcompany.com** — tự động deploy mỗi khi merge PR vào `main` (xem [deploy/README.md](deploy/README.md)).
 
 ## Chạy dự án
 

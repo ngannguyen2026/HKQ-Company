@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://hkq.vn/sitemap.xml
+Sitemap: https://bhqcompany.com/sitemap.xml
