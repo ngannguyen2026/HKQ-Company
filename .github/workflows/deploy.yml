@@ -1,0 +1,79 @@
+name: Deploy
+
+# Tự động deploy lên bhqcompany.com mỗi khi có commit vào main (tức là mỗi lần merge PR).
+# Có thể chạy tay ở tab Actions → Deploy → "Run workflow".
+# Thiết lập secrets & server: xem deploy/README.md.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Không cho 2 lần deploy chạy chồng nhau; lần sau xếp hàng chờ lần trước xong.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+env:
+  APP_DIR: /var/www/bhqcompany
+  SITE_URL: https://bhqcompany.com
+  KEEP_RELEASES: 5
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: production
+      url: https://bhqcompany.com
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      - name: Đặt tên release
+        run: |
+          RELEASE="$(date -u +%Y%m%d%H%M%S)-${GITHUB_SHA::7}"
+          echo "RELEASE=$RELEASE" >> "$GITHUB_ENV"
+          # File đánh dấu để kiểm tra sau deploy rằng server đang phục vụ đúng bản này.
+          echo "$RELEASE" > dist/release.txt
+
+      - name: Cấu hình SSH
+        run: |
+          install -d -m 700 ~/.ssh
+          echo "${{ secrets.DEPLOY_SSH_KEY }}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "${{ secrets.DEPLOY_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Upload release lên server
+        run: |
+          rsync -az --delete dist/ \
+            "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}:$APP_DIR/releases/$RELEASE/"
+
+      - name: Kích hoạt release & dọn bản cũ
+        run: |
+          ssh "${{ secrets.DEPLOY_USER }}@${{ secrets.DEPLOY_HOST }}" bash -s <<EOF
+          set -euo pipefail
+          cd "$APP_DIR"
+          # Đổi symlink nguyên tử: nginx chuyển sang bản mới ngay, không downtime.
+          ln -sfn "$APP_DIR/releases/$RELEASE" current.tmp
+          mv -T current.tmp current
+          # Giữ lại $KEEP_RELEASES bản gần nhất để có thể rollback.
+          ls -1d releases/*/ | sort | head -n -$KEEP_RELEASES | xargs -r rm -rf
+          echo "Đang phục vụ: \$(readlink current)"
+          EOF
+
+      - name: Kiểm tra site sau deploy
+        run: |
+          # Gọi thẳng vào server (bỏ qua cache Cloudflare) và so khớp tên release.
+          for i in 1 2 3 4 5; do
+            served="$(curl -fsS --resolve "bhqcompany.com:443:${{ secrets.DEPLOY_HOST }}" "$SITE_URL/release.txt" || true)"
+            [ "$served" = "$RELEASE" ] && { echo "OK: $SITE_URL đang chạy $RELEASE"; exit 0; }
+            sleep 3
+          done
+          echo "Server trả về '$served', mong đợi '$RELEASE'" >&2
+          exit 1
