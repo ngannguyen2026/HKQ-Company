@@ -141,7 +141,10 @@ const hasFacts = app.platforms.length > 0 || !!app.url || !!app.operator || app.
                   {String(i + 1).padStart(2, "0")}
                   {p.data.draft && <span class="draft">Bản nháp</span>}
                 </span>
-                <h3>{p.data.title}</h3>
+                <h3>
+                  {p.data.title}
+                  {p.data.en && <span class="p-en" lang="en">{p.data.en.title}</span>}
+                </h3>
                 <p>{p.data.description}</p>
                 <span class="p-meta">
                   Cập nhật {formatDate(p.data.updated)} <span class="go" aria-hidden="true">→</span>
@@ -413,6 +416,13 @@ const hasFacts = app.platforms.length > 0 || !!app.url || !!app.operator || app.
   .policy h3 {
     font-size: 22px;
     letter-spacing: -0.02em;
+  }
+  .p-en {
+    display: block;
+    margin-top: 4px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
   }
   .policy p {
     color: var(--muted);

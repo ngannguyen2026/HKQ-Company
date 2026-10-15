@@ -18,8 +18,20 @@ export type App = {
   status: "live" | "beta" | "coming-soon";
   /** Link tải ứng dụng trên các kho */
   stores?: { label: string; url: string }[];
-  /** Pháp nhân trực tiếp cung cấp dịch vụ (nếu khác Bảo Hân Quân Company) */
+  /** Pháp nhân trực tiếp cung cấp dịch vụ / nhà phát triển trên store (nếu khác Bảo Hân Quân Company) */
   operator?: string;
+  /** Tên tiếng Anh của pháp nhân trên, đúng như tên nhà phát triển hiển thị trên App Store */
+  operatorEn?: string;
+  /** Màn hình minh hoạ trên điện thoại trong khối giới thiệu ở trang chủ */
+  showcase: {
+    art: "hexagram" | "maze";
+    /** Dòng chữ nhỏ dưới tên app */
+    hint: string;
+    /** Nút trên màn hình */
+    cta: string;
+    /** 8 ký hiệu xếp vòng quanh điện thoại */
+    ring: string[];
+  };
   /**
    * false = chưa công bố: không hiện ở trang chủ, footer, sitemap; trang sản phẩm vẫn truy cập được
    * bằng link (dùng khi cần URL chính sách để nộp lên kho ứng dụng trước ngày ra mắt).
@@ -64,19 +76,39 @@ export const apps: App[] = [
       { label: "Google Play", url: "https://play.google.com/store/apps/details?id=com.thienminhdich.app&hl=vi" },
     ],
     operator: "Công ty TNHH Thiên Minh Dịch",
+    operatorEn: "Thiên Minh Dịch Company Limited",
+    showcase: {
+      art: "hexagram",
+      hint: "Một khoảng lặng để nhìn rõ điều đang nghĩ",
+      cta: "Gieo quẻ",
+      ring: ["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"],
+    },
   },
   {
-    slug: "maze",
-    name: "Maze",
+    slug: "maze-memory",
+    name: "Maze Memory",
     category: "Game · Offline",
-    // TODO: thay các nội dung giới thiệu bên dưới khi có thông tin chính thức
     tagline: "Tìm đường ra khỏi mê cung.",
-    description: "Game giải mê cung chơi offline, không cần kết nối mạng.",
-    features: [],
-    platforms: [],
+    description:
+      "Game mê cung chơi offline — không quảng cáo, không cần tài khoản, không thu thập dữ liệu cá nhân.",
+    features: [
+      "Chơi offline, không cần kết nối mạng",
+      "Không quảng cáo, không cần tài khoản",
+      "Lời nhắc chơi tuỳ chọn, tắt được bất cứ lúc nào",
+      "Nhiều ngôn ngữ",
+    ],
+    platforms: ["iOS", "Android"],
     mark: "▦",
     accent: "#3d7be0",
     status: "coming-soon",
-    listed: false,
+    // Phát hành trên store bằng tài khoản nhà phát triển của Công ty TNHH Thiên Minh Dịch
+    operator: "Công ty TNHH Thiên Minh Dịch",
+    operatorEn: "Thiên Minh Dịch Company Limited",
+    showcase: {
+      art: "maze",
+      hint: "Chơi offline · Không quảng cáo",
+      cta: "Chơi",
+      ring: ["↑", "→", "↓", "←", "↑", "→", "↓", "←"],
+    },
   },
 ];

@@ -38,11 +38,12 @@ function initAnchors() {
   $$<HTMLAnchorElement>('a[href^="#"]').forEach((a) => {
     a.addEventListener("click", (e) => {
       const id = a.getAttribute("href")!;
-      const target = id === "#top" ? 0 : $(id);
+      // getElementById thay vì querySelector: id của tiêu đề có thể bắt đầu bằng số (vd. "1-pham-vi")
+      const target = id === "#top" ? 0 : document.getElementById(decodeURIComponent(id.slice(1)));
       if (target === null) return;
       e.preventDefault();
-      // chừa chỗ cho header cố định khi nhảy tới một mục
-      if (lenis) lenis.scrollTo(target as any, { duration: 1.6, offset: target === 0 ? 0 : -96 });
+      // khoảng chừa cho header cố định lấy từ scroll-margin-top của phần tử đích (Lenis tự tính)
+      if (lenis) lenis.scrollTo(target as any, { duration: 1.6 });
       else if (target === 0) scrollTo({ top: 0, behavior: "smooth" });
       else (target as HTMLElement).scrollIntoView({ behavior: "smooth" });
     });
@@ -311,6 +312,7 @@ function initShowcase() {
     const phone = $("[data-phone]", sc)!;
     const ring = $("[data-ring]", sc)!;
     const hexLines = $$(".hline span", sc);
+    const draw = $$("[data-draw]", sc);
     const features = $$("[data-feature]", sc);
     const chips = $$("[data-chip]", sc);
 
@@ -337,13 +339,22 @@ function initShowcase() {
         scrollTrigger: { trigger: sc, start: "top bottom", end: "bottom top", scrub: true },
       });
     });
-    gsap.from(hexLines, {
-      scaleX: 0,
-      duration: 0.8,
-      stagger: { each: 0.12, from: "end" },
-      ease: "expo.out",
-      scrollTrigger: { trigger: phone, start: "top 70%", once: true },
-    });
+    // đường đi trong mê cung tự vẽ dần (path có pathLength="1")
+    if (draw.length)
+      gsap.fromTo(draw, { strokeDasharray: 1, strokeDashoffset: 1 }, {
+        strokeDashoffset: 0,
+        duration: 2.2,
+        ease: "power2.inOut",
+        scrollTrigger: { trigger: phone, start: "top 70%", once: true },
+      });
+    if (hexLines.length)
+      gsap.from(hexLines, {
+        scaleX: 0,
+        duration: 0.8,
+        stagger: { each: 0.12, from: "end" },
+        ease: "expo.out",
+        scrollTrigger: { trigger: phone, start: "top 70%", once: true },
+      });
     // nhẹ nhàng lơ lửng
     gsap.to(phone, { yPercent: -3, duration: 3, ease: "sine.inOut", yoyo: true, repeat: -1 });
 
@@ -461,7 +472,7 @@ async function init() {
 
   if (hash) {
     history.replaceState(null, "", location.pathname + location.search + hash);
-    const target = $(decodeURIComponent(hash));
+    const target = document.getElementById(decodeURIComponent(hash.slice(1)));
     // Lenis lưu chiều cao trang từ trước khi pin-spacing được thêm → đo lại trước khi cuộn
     lenis?.resize();
     if (target) lenis?.scrollTo(target, { immediate: true, force: true });

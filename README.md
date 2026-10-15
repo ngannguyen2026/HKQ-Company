@@ -36,12 +36,14 @@ Mỗi sản phẩm trong `src/data/apps.ts` tự có các trang:
 
 Tên thư mục trong `src/content/` phải trùng `slug` của sản phẩm (ví dụ `thien-minh-dich`).
 
-### Sản phẩm chưa công bố
+### Sản phẩm mới
 
-Đặt `listed: false` trong `src/data/apps.ts`: sản phẩm không hiện ở trang chủ, footer và sitemap, nhưng
-trang `/san-pham/<slug>/` và các trang chính sách vẫn truy cập được bằng link (có `noindex`). Dùng khi cần URL
-chính sách để nộp lên App Store / Google Play trước ngày ra mắt. Khi công bố: bỏ `listed: false` và thiết kế
-phần hình minh hoạ trong `src/components/AppShowcase.astro` (hiện đang dành riêng cho Thiên Minh Dịch).
+Thêm một object vào `src/data/apps.ts`. Trường `showcase` quyết định màn hình minh hoạ trên điện thoại ở trang chủ
+(`art: "hexagram"` của Thiên Minh Dịch, `art: "maze"` của Maze Memory — sản phẩm có kiểu minh hoạ mới thì thêm
+một nhánh trong `src/components/AppShowcase.astro`).
+
+Đặt `listed: false` nếu chưa muốn công bố: sản phẩm không hiện ở trang chủ, footer và sitemap, nhưng trang
+`/san-pham/<slug>/` và các trang chính sách vẫn truy cập được bằng link (có `noindex`).
 
 ### Thêm / sửa chính sách
 
@@ -55,6 +57,10 @@ updated: 2026-07-31          # ngày cập nhật lần cuối
 order: 2                     # thứ tự trong danh sách (nhỏ đứng trước)
 source: "https://..."        # tuỳ chọn: link bản gốc
 draft: true                  # tuỳ chọn: hiện nhãn "Bản nháp", không lập chỉ mục, không đưa vào sitemap
+toc: 3                       # tuỳ chọn: mục lục gồm cả tiêu đề "###"
+en:                          # tuỳ chọn: trang song ngữ (xem src/content/policies/maze-memory/)
+  title: "Privacy Policy"
+  description: "..."
 ---
 
 ## 1. Phạm vi áp dụng
