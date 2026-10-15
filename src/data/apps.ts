@@ -89,11 +89,10 @@ export const apps: App[] = [
     name: "Maze Memory",
     category: "Game · Offline",
     tagline: "Tìm đường ra khỏi mê cung.",
-    description:
-      "Game mê cung chơi offline — không quảng cáo, không cần tài khoản, không thu thập dữ liệu cá nhân.",
+    description: "Game mê cung chơi offline, không cần kết nối mạng hay tài khoản.",
     features: [
       "Chơi offline, không cần kết nối mạng",
-      "Không quảng cáo, không cần tài khoản",
+      "Không cần tài khoản",
       "Lời nhắc chơi tuỳ chọn, tắt được bất cứ lúc nào",
       "Nhiều ngôn ngữ",
     ],
@@ -106,7 +105,7 @@ export const apps: App[] = [
     operatorEn: "Thiên Minh Dịch Company Limited",
     showcase: {
       art: "maze",
-      hint: "Chơi offline · Không quảng cáo",
+      hint: "Chơi mọi lúc, không cần mạng",
       cta: "Chơi",
       ring: ["↑", "→", "↓", "←", "↑", "→", "↓", "←"],
     },
