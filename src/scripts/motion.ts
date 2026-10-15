@@ -41,7 +41,8 @@ function initAnchors() {
       const target = id === "#top" ? 0 : $(id);
       if (target === null) return;
       e.preventDefault();
-      if (lenis) lenis.scrollTo(target as any, { duration: 1.6 });
+      // chừa chỗ cho header cố định khi nhảy tới một mục
+      if (lenis) lenis.scrollTo(target as any, { duration: 1.6, offset: target === 0 ? 0 : -96 });
       else if (target === 0) scrollTo({ top: 0, behavior: "smooth" });
       else (target as HTMLElement).scrollIntoView({ behavior: "smooth" });
     });
@@ -423,6 +424,11 @@ async function init() {
     return;
   }
 
+  // Vào từ link dạng "/#san-pham": nếu để trình duyệt tự nhảy tới mục trong lúc ScrollTrigger đang khởi tạo
+  // thì các trigger `once` bị kích hoạt và tự huỷ giữa chừng → lỗi. Tạm gỡ hash, cuộn tới mục sau khi khởi tạo xong.
+  const hash = location.hash;
+  if (hash) history.replaceState(null, "", location.pathname + location.search);
+
   history.scrollRestoration = "manual";
   scrollTo(0, 0);
 
@@ -452,6 +458,14 @@ async function init() {
   initFooter();
 
   ScrollTrigger.refresh();
+
+  if (hash) {
+    history.replaceState(null, "", location.pathname + location.search + hash);
+    const target = $(decodeURIComponent(hash));
+    // Lenis lưu chiều cao trang từ trước khi pin-spacing được thêm → đo lại trước khi cuộn
+    lenis?.resize();
+    if (target) lenis?.scrollTo(target, { immediate: true, force: true });
+  }
 }
 
 init();

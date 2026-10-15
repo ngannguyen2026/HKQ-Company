@@ -1,17 +1,25 @@
 ---
 import { company } from "../data/site";
 
+interface Props {
+  /** Ở trang chủ dùng anchor "#id" để cuộn mượt; ở trang con trỏ về "/#id" */
+  home?: boolean;
+}
+
+const { home = false } = Astro.props;
+const base = home ? "" : "/";
 const links = [
-  { href: "#gioi-thieu", label: "Giới thiệu" },
-  { href: "#nang-luc", label: "Năng lực" },
-  { href: "#san-pham", label: "Sản phẩm" },
-  { href: "#gia-tri", label: "Giá trị" },
+  { href: `${base}#gioi-thieu`, label: "Giới thiệu" },
+  { href: `${base}#nang-luc`, label: "Năng lực" },
+  { href: `${base}#san-pham`, label: "Sản phẩm" },
+  { href: `${base}#gia-tri`, label: "Giá trị" },
 ];
+const contact = `${base}#lien-he`;
 ---
 
 <header class="header" data-header>
   <div class="container inner">
-    <a href="#top" class="logo" aria-label={`${company.name} — Trang chủ`} data-hover>
+    <a href={home ? "#top" : "/"} class="logo" aria-label={`${company.name} — Trang chủ`} data-hover>
       <span class="logo-mark">
         <svg viewBox="0 0 32 32" aria-hidden="true">
           <circle cx="16" cy="16" r="15" fill="none" stroke="url(#lg)" stroke-width="2"></circle>
@@ -42,7 +50,7 @@ const links = [
       </ul>
     </nav>
 
-    <a href="#lien-he" class="btn btn-ghost cta" data-magnetic data-hover>
+    <a href={contact} class="btn btn-ghost cta" data-magnetic data-hover>
       Liên hệ <span class="arrow">↗</span>
     </a>
 
@@ -54,7 +62,7 @@ const links = [
   <nav class="mobile-menu" id="mobile-menu" aria-label="Menu di động" data-mobile-menu>
     <ul>
       {
-        [...links, { href: "#lien-he", label: "Liên hệ" }].map((l, i) => (
+        [...links, { href: contact, label: "Liên hệ" }].map((l, i) => (
           <li>
             <a href={l.href} data-menu-link>
               <small>0{i + 1}</small>

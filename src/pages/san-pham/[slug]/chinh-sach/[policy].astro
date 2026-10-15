@@ -1,0 +1,238 @@
+---
+import { render } from "astro:content";
+import ProductLayout from "../../../../layouts/ProductLayout.astro";
+import { apps, appPath, type App } from "../../../../data/apps";
+import { getPolicies, policyPath, entrySlug, productOf, formatDate, type Policy } from "../../../../data/content";
+
+export async function getStaticPaths() {
+  const policies = await getPolicies();
+  return policies.flatMap((policy) => {
+    const app = apps.find((a) => a.slug === productOf(policy.id));
+    if (!app) throw new Error(`Chính sách "${policy.id}" nằm trong thư mục không khớp sản phẩm nào trong src/data/apps.ts`);
+    const siblings = policies.filter((p) => productOf(p.id) === app.slug);
+    return [{ params: { slug: app.slug, policy: entrySlug(policy.id) }, props: { app, policy, siblings } }];
+  });
+}
+
+const { app, policy, siblings } = Astro.props as { app: App; policy: Policy; siblings: Policy[] };
+const { Content, headings } = await render(policy);
+const toc = headings.filter((h) => h.depth === 2);
+const i = siblings.findIndex((p) => p.id === policy.id);
+const pager = [
+  { rel: "prev", label: "Chính sách trước", entry: siblings[i - 1] },
+  { rel: "next", label: "Chính sách tiếp theo", entry: siblings[i + 1] },
+].filter((p) => p.entry);
+---
+
+<ProductLayout
+  app={app}
+  title={policy.data.title}
+  description={policy.data.description}
+  crumbs={[{ label: "Chính sách", href: `${appPath(app.slug)}#chinh-sach` }, { label: policy.data.title }]}
+>
+  <div class="container doc">
+    <header class="doc-head">
+      <span class="label">Chính sách · {app.name}</span>
+      <h1>{policy.data.title}</h1>
+      <p class="lead">{policy.data.description}</p>
+      <p class="meta">
+        <span>Cập nhật lần cuối: <time datetime={policy.data.updated.toISOString().slice(0, 10)}>{formatDate(policy.data.updated)}</time></span>
+        {
+          policy.data.source && (
+            <a href={policy.data.source} target="_blank" rel="noopener" data-hover>
+              Bản công bố trên {new URL(policy.data.source).hostname} ↗
+            </a>
+          )
+        }
+      </p>
+    </header>
+
+    <aside class="side">
+      {
+        toc.length > 1 && (
+          <nav class="side-block" aria-label="Mục lục">
+            <p class="side-title">Trong chính sách này</p>
+            <ol class="toc">
+              {toc.map((h) => (
+                <li>
+                  <a href={`#${h.slug}`} data-hover>{h.text}</a>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )
+      }
+      <nav class="side-block" aria-label={`Chính sách của ${app.name}`}>
+        <p class="side-title">Chính sách của {app.name}</p>
+        <ul class="others">
+          {
+            siblings.map((p) => (
+              <li>
+                <a href={policyPath(p)} aria-current={p.id === policy.id ? "page" : undefined} data-hover>
+                  {p.data.title}
+                </a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+    </aside>
+
+    <article class="prose">
+      <Content />
+    </article>
+
+    {
+      pager.length > 0 && (
+        <nav class="pager" aria-label="Chính sách khác">
+          {pager.map((p) => (
+            <a class={`pager-${p.rel}`} href={policyPath(p.entry!)} rel={p.rel} data-hover>
+              <small>{p.rel === "prev" ? "← " : ""}{p.label}{p.rel === "next" ? " →" : ""}</small>
+              <span>{p.entry!.data.title}</span>
+            </a>
+          ))}
+        </nav>
+      )
+    }
+  </div>
+</ProductLayout>
+
+<style>
+  .doc {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 280px;
+    grid-template-areas:
+      "head head"
+      "body side"
+      "pager side";
+    column-gap: clamp(40px, 6vw, 96px);
+    padding-top: clamp(40px, 6vw, 64px);
+    padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .doc-head {
+    grid-area: head;
+    max-width: 860px;
+    padding-bottom: 40px;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+  .doc-head h1 {
+    margin-top: 20px;
+    font-size: clamp(38px, 5.4vw, 72px);
+    font-weight: 800;
+    letter-spacing: -0.045em;
+  }
+  .lead {
+    margin-top: 20px;
+    font-size: 18px;
+    color: var(--muted);
+  }
+  .meta {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .meta time {
+    color: var(--text);
+  }
+  .meta a {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .meta a:hover {
+    color: var(--text);
+  }
+  .prose {
+    grid-area: body;
+  }
+  .pager {
+    grid-area: pager;
+    max-width: 760px;
+    margin-top: 72px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .pager a {
+    display: grid;
+    gap: 6px;
+    padding: 20px 24px;
+    border-radius: 18px;
+    border: 1px solid var(--border);
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .pager a:hover {
+    border-color: var(--border-strong);
+    background: var(--surface);
+  }
+  .pager small {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .pager span {
+    font-weight: 600;
+  }
+  .pager-next {
+    grid-column: 2;
+    text-align: right;
+  }
+  .side {
+    grid-area: side;
+    position: sticky;
+    top: 100px;
+    align-self: start;
+    display: grid;
+    gap: 32px;
+  }
+  .side-title {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .toc,
+  .others {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 2px;
+    font-size: 14.5px;
+  }
+  .toc a,
+  .others a {
+    display: block;
+    padding: 6px 0 6px 14px;
+    border-left: 1px solid var(--border);
+    color: var(--muted);
+    transition: color 0.3s, border-color 0.3s;
+  }
+  .toc a:hover,
+  .others a:hover {
+    color: var(--text);
+  }
+  .others a[aria-current] {
+    color: var(--text);
+    border-left-color: var(--app-accent);
+    border-left-width: 2px;
+  }
+
+  @media (max-width: 960px) {
+    .doc {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas: "head" "side" "body" "pager";
+    }
+    .side {
+      position: static;
+      margin-bottom: 48px;
+    }
+    /* trên di động chỉ giữ mục lục; danh sách chính sách khác chuyển xuống cuối trang */
+    .side-block:last-child:not(:first-child) {
+      display: none;
+    }
+  }
+</style>

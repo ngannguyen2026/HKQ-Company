@@ -1,0 +1,412 @@
+---
+import ProductLayout from "../../../layouts/ProductLayout.astro";
+import { apps, statusLabel, type App } from "../../../data/apps";
+import { getPolicies, getAnnouncements, policyPath, announcementPath, formatDate } from "../../../data/content";
+
+export function getStaticPaths() {
+  return apps.map((app) => ({ params: { slug: app.slug }, props: { app } }));
+}
+
+const { app } = Astro.props as { app: App };
+const policies = await getPolicies(app.slug);
+const announcements = await getAnnouncements(app.slug);
+---
+
+<ProductLayout app={app}>
+  <!-- ============ TỔNG QUAN ============ -->
+  <section class="container intro">
+    <div class="intro-main">
+      <div class="identity">
+        <span class="mark" aria-hidden="true">{app.mark}</span>
+        <div>
+          <p class="category">{app.category}</p>
+          <span class="status"><i></i>{statusLabel[app.status]}</span>
+        </div>
+      </div>
+      <h1 class="name">{app.name}</h1>
+      <p class="tagline serif">“{app.tagline}”</p>
+      <p class="desc">{app.description}</p>
+
+      <div class="actions">
+        <a class="btn btn-primary" href={app.url} target="_blank" rel="noopener" data-magnetic data-hover>
+          Truy cập {app.domain} <span class="arrow">↗</span>
+        </a>
+        {
+          app.stores?.map((s) => (
+            <a class="btn btn-ghost" href={s.url} target="_blank" rel="noopener" data-magnetic data-hover>
+              {s.label} <span class="arrow">↗</span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+
+    <dl class="facts">
+      <div>
+        <dt>Nền tảng</dt>
+        <dd>{app.platforms.join(" · ")}</dd>
+      </div>
+      <div>
+        <dt>Website</dt>
+        <dd><a href={app.url} target="_blank" rel="noopener" data-hover>{app.domain}</a></dd>
+      </div>
+      {
+        app.operator && (
+          <div>
+            <dt>Đơn vị cung cấp dịch vụ</dt>
+            <dd>{app.operator}</dd>
+          </div>
+        )
+      }
+      <div>
+        <dt>Tính năng chính</dt>
+        <dd>
+          <ul>{app.features.map((f) => <li>{f}</li>)}</ul>
+        </dd>
+      </div>
+    </dl>
+  </section>
+
+  <nav class="container jump" aria-label="Mục trong trang">
+    <a href="#thong-bao" data-hover>Thông báo <span>{announcements.length}</span></a>
+    <a href="#chinh-sach" data-hover>Chính sách <span>{policies.length}</span></a>
+  </nav>
+
+  <!-- ============ THÔNG BÁO ============ -->
+  <section id="thong-bao" class="container block">
+    <div class="block-head">
+      <span class="label">Thông báo</span>
+      <h2 class="h-block">Tin mới từ <span class="serif accent">{app.name}</span></h2>
+    </div>
+
+    {
+      announcements.length ? (
+        <ol class="news">
+          {announcements.map((a) => (
+            <li>
+              <a class="news-item" href={announcementPath(a)} data-hover>
+                <time datetime={a.data.date.toISOString().slice(0, 10)}>{formatDate(a.data.date)}</time>
+                <div class="news-body">
+                  <span class="tag">{a.data.pinned && "Ghim · "}{a.data.tag}</span>
+                  <h3>{a.data.title}</h3>
+                  <p>{a.data.summary}</p>
+                </div>
+                <span class="go" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="empty">Hiện chưa có thông báo nào cho {app.name}.</p>
+      )
+    }
+  </section>
+
+  <!-- ============ CHÍNH SÁCH ============ -->
+  <section id="chinh-sach" class="container block">
+    <div class="block-head">
+      <span class="label">Chính sách</span>
+      <h2 class="h-block">Điều khoản & <span class="serif accent">chính sách</span></h2>
+      <p class="block-lead">Các tài liệu áp dụng khi bạn sử dụng {app.name}.</p>
+    </div>
+
+    {
+      policies.length ? (
+        <ol class="policies">
+          {policies.map((p, i) => (
+            <li>
+              <a class="policy" href={policyPath(p)} data-hover>
+                <span class="p-no">{String(i + 1).padStart(2, "0")}</span>
+                <h3>{p.data.title}</h3>
+                <p>{p.data.description}</p>
+                <span class="p-meta">
+                  Cập nhật {formatDate(p.data.updated)} <span class="go" aria-hidden="true">→</span>
+                </span>
+              </a>
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p class="empty">Chính sách của {app.name} đang được cập nhật.</p>
+      )
+    }
+  </section>
+</ProductLayout>
+
+<style>
+  /* ---------- tổng quan ---------- */
+  .intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+    gap: clamp(40px, 6vw, 96px);
+    align-items: end;
+    padding-top: clamp(40px, 6vw, 72px);
+    padding-bottom: clamp(48px, 6vw, 80px);
+  }
+  .identity {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .mark {
+    width: 64px;
+    height: 64px;
+    flex: none;
+    display: grid;
+    place-items: center;
+    border-radius: 18px;
+    font-size: 32px;
+    background: var(--app-accent);
+    box-shadow: 0 20px 50px -12px color-mix(in srgb, var(--app-accent) 70%, transparent);
+  }
+  .category {
+    font-size: 15px;
+    color: var(--muted);
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font-size: 13px;
+    color: #7ee2a8;
+  }
+  .status i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .name {
+    margin-top: 32px;
+    font-size: clamp(48px, 8vw, 112px);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 0.95;
+  }
+  .tagline {
+    margin-top: 20px;
+    font-size: clamp(22px, 2.4vw, 30px);
+    color: color-mix(in srgb, var(--app-accent) 55%, #fff);
+  }
+  .desc {
+    margin-top: 20px;
+    max-width: 600px;
+    color: var(--muted);
+    font-size: 18px;
+  }
+  .actions {
+    margin-top: 36px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .facts {
+    margin: 0;
+    border-top: 1px solid var(--border);
+  }
+  .facts > div {
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .facts dt {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .facts dd {
+    margin: 6px 0 0;
+    font-size: 16px;
+  }
+  .facts dd a:hover {
+    color: var(--c2);
+  }
+  .facts ul {
+    margin: 0;
+    padding-left: 1.1em;
+    color: #d9d5ce;
+  }
+  .facts li + li {
+    margin-top: 4px;
+  }
+
+  /* ---------- điều hướng mục ---------- */
+  .jump {
+    display: flex;
+    gap: 8px;
+  }
+  .jump a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    font-size: 15px;
+    font-weight: 500;
+    transition: background 0.3s, color 0.3s;
+  }
+  .jump a:hover {
+    background: var(--text);
+    color: #0a0a0a;
+  }
+  .jump span {
+    min-width: 22px;
+    padding: 0 6px;
+    border-radius: 999px;
+    background: var(--surface-hover);
+    font-size: 12px;
+    text-align: center;
+  }
+
+  /* ---------- khối chung ---------- */
+  .block {
+    padding-top: clamp(56px, 8vw, 104px);
+    scroll-margin-top: 40px;
+  }
+  .block:last-child {
+    padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .block-head {
+    display: grid;
+    gap: 18px;
+    margin-bottom: 40px;
+  }
+  .h-block {
+    font-size: clamp(32px, 4.6vw, 60px);
+  }
+  .accent {
+    color: color-mix(in srgb, var(--app-accent) 55%, #fff);
+  }
+  .block-lead {
+    color: var(--muted);
+    font-size: 17px;
+  }
+  .empty {
+    padding: 32px;
+    border: 1px dashed var(--border-strong);
+    border-radius: var(--radius);
+    color: var(--muted);
+  }
+  .go {
+    display: inline-block;
+    transition: transform 0.4s var(--ease);
+  }
+
+  /* ---------- thông báo ---------- */
+  .news {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+  .news-item {
+    display: grid;
+    grid-template-columns: 140px minmax(0, 1fr) auto;
+    gap: 24px;
+    align-items: baseline;
+    padding: 28px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .news-item time {
+    font-size: 15px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .tag {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .news-body h3 {
+    margin-top: 10px;
+    font-size: clamp(20px, 2vw, 26px);
+    transition: color 0.3s;
+  }
+  .news-body p {
+    margin-top: 8px;
+    color: var(--muted);
+    max-width: 720px;
+  }
+  .news-item .go {
+    font-size: 22px;
+  }
+  .news-item:hover h3 {
+    color: color-mix(in srgb, var(--app-accent) 55%, #fff);
+  }
+  .news-item:hover .go {
+    transform: translateX(6px);
+  }
+
+  /* ---------- chính sách ---------- */
+  .policies {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: 16px;
+  }
+  .policies li {
+    display: flex;
+  }
+  .policy {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    padding: 28px;
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    background: var(--surface);
+    transition: border-color 0.4s, background 0.4s, translate 0.5s var(--ease);
+  }
+  .policy:hover {
+    border-color: color-mix(in srgb, var(--app-accent) 60%, transparent);
+    background: var(--surface-hover);
+    translate: 0 -4px;
+  }
+  .p-no {
+    font-size: 13px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .policy h3 {
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .policy p {
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .p-meta {
+    margin-top: auto;
+    padding-top: 12px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .policy:hover .go {
+    transform: translateX(6px);
+  }
+
+  @media (max-width: 900px) {
+    .intro {
+      grid-template-columns: 1fr;
+    }
+  }
+  @media (max-width: 640px) {
+    .news-item {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 8px;
+    }
+    .news-item .go {
+      display: none;
+    }
+  }
+</style>

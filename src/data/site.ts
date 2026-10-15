@@ -1,12 +1,12 @@
 // Thông tin chung của công ty — cập nhật tại đây.
-// TODO: thay các giá trị placeholder (email, địa chỉ, domain, số liệu) bằng thông tin thật.
 export const company = {
-  name: "Bảo Hân Quân",
-  fullName: "Công ty Bảo Hân Quân",
+  name: "Bảo Hân Quân Company",
+  fullName: "Bảo Hân Quân Company",
+  domain: "bhqcompany.com",
   tagline: "Xây dựng sản phẩm số mang giá trị Việt",
   description:
-    "Bảo Hân Quân phát triển và vận hành các ứng dụng web & di động, kết hợp tri thức truyền thống với công nghệ hiện đại để tạo ra trải nghiệm hữu ích cho người Việt.",
-  email: "contact@hkq.vn",
+    "Bảo Hân Quân Company phát triển và vận hành các ứng dụng web & di động, kết hợp tri thức truyền thống với công nghệ hiện đại để tạo ra trải nghiệm hữu ích cho người Việt.",
+  email: "contact@bhqcompany.com",
   address: "Việt Nam",
   year: new Date().getFullYear(),
   // Thông tin pháp lý — chỉ hiển thị ở footer khi có giá trị.
@@ -62,7 +62,7 @@ export const values = [
   {
     no: "03",
     title: "Vận hành bền vững",
-    text: "Bảo Hân Quân trực tiếp phát triển, vận hành và chăm sóc từng ứng dụng lâu dài trên web, iOS và Android.",
+    text: "Bảo Hân Quân Company trực tiếp phát triển, vận hành và chăm sóc từng ứng dụng lâu dài trên web, iOS và Android.",
   },
 ];
 
