@@ -7,15 +7,21 @@ interface Props {
 }
 
 const { app, index } = Astro.props;
+const { art, hint, cta, ring } = app.showcase;
 // Quẻ minh hoạ trên màn hình điện thoại: true = hào dương (liền), false = hào âm (đứt)
 const lines = [true, false, true, true, false, true];
+// Mê cung 7×7 minh hoạ (mỗi ô 10 đơn vị) và đường đi từ lối vào trên-trái tới lối ra dưới-phải
+const mazeWalls =
+  "M0 0h10M0 10h10M0 10v10M0 20v10M0 30v10M0 40v10M0 50v10M0 60v10M0 70h10M10 0h10M10 10v10M10 20h10M10 30v10M10 40h10M10 50h10M10 50v10M10 60h10M10 70h10M20 0h10M20 0v10M20 10h10M20 20h10M20 20v10M20 30v10M20 50h10M20 60h10M20 70h10M30 0h10M30 20h10M30 30v10M30 40v10M30 50h10M30 70h10M40 0h10M40 10v10M40 20h10M40 30v10M40 40h10M40 50v10M40 60v10M40 70h10M50 0h10M50 0v10M50 10h10M50 20h10M50 30h10M50 30v10M50 40v10M50 50v10M50 70h10M60 0h10M70 0v10M70 10v10M60 20v10M70 20v10M70 30v10M60 40h10M60 40v10M70 40v10M60 50v10M70 50v10M60 70h10";
+const mazePath =
+  "M-4 5L5 5L15 5L15 15L25 15L35 15L35 5L45 5L45 15L55 15L65 15L65 25L65 35L55 35L55 45L55 55L55 65L65 65L74 65";
 ---
 
 <article class="showcase" style={`--app-accent: ${app.accent}`} data-showcase>
   <div class="visual">
     <div class="glow" aria-hidden="true"></div>
     <div class="ring" aria-hidden="true" data-ring>
-      {["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"].map((t, i) => <span style={`--i:${i}`}>{t}</span>)}
+      {ring.map((t, i) => <span style={`--i:${i}`}>{t}</span>)}
     </div>
 
     <div class="phone" data-phone>
@@ -25,19 +31,30 @@ const lines = [true, false, true, true, false, true];
           <span class="app-logo">{app.mark}</span>
           <span>{app.name}</span>
         </div>
-        <p class="app-hint">Một khoảng lặng để nhìn rõ điều đang nghĩ</p>
-        <div class="hexagram" data-hexagram>
-          {
-            lines.map((yang) => (
-              <div class={`hline ${yang ? "yang" : "yin"}`}>
-                <span />
-                {!yang && <span />}
-              </div>
-            ))
-          }
-        </div>
+        <p class="app-hint">{hint}</p>
+        {
+          art === "hexagram" && (
+            <div class="hexagram" data-hexagram>
+              {lines.map((yang) => (
+                <div class={`hline ${yang ? "yang" : "yin"}`}>
+                  <span />
+                  {!yang && <span />}
+                </div>
+              ))}
+            </div>
+          )
+        }
+        {
+          art === "maze" && (
+            <svg class="maze" viewBox="-6 -6 82 82" aria-hidden="true">
+              <path class="maze-walls" d={mazeWalls} />
+              <path class="maze-path" d={mazePath} pathLength="1" data-draw />
+              <circle class="maze-goal" cx="74" cy="65" r="2.6" />
+            </svg>
+          )
+        }
         <p class="app-quote">“{app.tagline}”</p>
-        <div class="app-btn">Gieo quẻ</div>
+        <div class="app-btn">{cta}</div>
       </div>
     </div>
 
@@ -53,7 +70,7 @@ const lines = [true, false, true, true, false, true];
   <div class="info">
     <div class="meta" data-reveal>
       <span class="num">{String(index + 1).padStart(2, "0")}</span>
-      <span class="status"><i></i>{statusLabel[app.status]}</span>
+      <span class={`status ${app.status}`}><i></i>{statusLabel[app.status]}</span>
     </div>
     <p class="category" data-reveal>{app.category}</p>
     <h3 class="name" data-split>{app.name}</h3>
@@ -75,9 +92,13 @@ const lines = [true, false, true, true, false, true];
       <a class="btn btn-primary" href={appPath(app.slug)} data-magnetic data-hover>
         Chính sách & thông báo <span class="arrow">→</span>
       </a>
-      <a class="btn btn-ghost" href={app.url} target="_blank" rel="noopener" data-magnetic data-hover>
-        Truy cập {app.domain} <span class="arrow">↗</span>
-      </a>
+      {
+        app.url && (
+          <a class="btn btn-ghost" href={app.url} target="_blank" rel="noopener" data-magnetic data-hover>
+            Truy cập {app.domain} <span class="arrow">↗</span>
+          </a>
+        )
+      }
     </div>
   </div>
 </article>
@@ -206,6 +227,28 @@ const lines = [true, false, true, true, false, true];
     box-shadow: 0 0 14px rgb(232 180 90 / 0.4);
     transform-origin: left center;
   }
+  .maze {
+    margin: auto 0;
+    width: 86%;
+    overflow: visible;
+  }
+  .maze-walls {
+    fill: none;
+    stroke: rgb(255 255 255 / 0.55);
+    stroke-width: 1.4;
+    stroke-linecap: square;
+  }
+  .maze-path {
+    fill: none;
+    stroke: #e8b45a;
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 3px rgb(232 180 90 / 0.6));
+  }
+  .maze-goal {
+    fill: #f3d9a4;
+  }
   .app-quote {
     font-family: "Playfair Display", serif;
     font-style: italic;
@@ -257,6 +300,13 @@ const lines = [true, false, true, true, false, true];
     border-radius: 999px;
     border: 1px solid var(--border);
     color: #7ee2a8;
+  }
+  .status:not(.live) {
+    color: var(--c2);
+  }
+  .status:not(.live) i {
+    background: var(--c2);
+    animation: none;
   }
   .status i {
     width: 7px;

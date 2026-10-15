@@ -10,6 +10,7 @@ export function getStaticPaths() {
 const { app } = Astro.props as { app: App };
 const policies = await getPolicies(app.slug);
 const announcements = await getAnnouncements(app.slug);
+const hasFacts = app.platforms.length > 0 || !!app.url || !!app.operator || app.features.length > 0;
 ---
 
 <ProductLayout app={app}>
@@ -20,51 +21,71 @@ const announcements = await getAnnouncements(app.slug);
         <span class="mark" aria-hidden="true">{app.mark}</span>
         <div>
           <p class="category">{app.category}</p>
-          <span class="status"><i></i>{statusLabel[app.status]}</span>
+          <span class={`status ${app.status}`}><i></i>{statusLabel[app.status]}</span>
         </div>
       </div>
       <h1 class="name">{app.name}</h1>
       <p class="tagline serif">“{app.tagline}”</p>
       <p class="desc">{app.description}</p>
 
-      <div class="actions">
-        <a class="btn btn-primary" href={app.url} target="_blank" rel="noopener" data-magnetic data-hover>
-          Truy cập {app.domain} <span class="arrow">↗</span>
-        </a>
-        {
-          app.stores?.map((s) => (
-            <a class="btn btn-ghost" href={s.url} target="_blank" rel="noopener" data-magnetic data-hover>
-              {s.label} <span class="arrow">↗</span>
-            </a>
-          ))
-        }
-      </div>
-    </div>
-
-    <dl class="facts">
-      <div>
-        <dt>Nền tảng</dt>
-        <dd>{app.platforms.join(" · ")}</dd>
-      </div>
-      <div>
-        <dt>Website</dt>
-        <dd><a href={app.url} target="_blank" rel="noopener" data-hover>{app.domain}</a></dd>
-      </div>
       {
-        app.operator && (
-          <div>
-            <dt>Đơn vị cung cấp dịch vụ</dt>
-            <dd>{app.operator}</dd>
+        (app.url || app.stores?.length) && (
+          <div class="actions">
+            {app.url && (
+              <a class="btn btn-primary" href={app.url} target="_blank" rel="noopener" data-magnetic data-hover>
+                Truy cập {app.domain} <span class="arrow">↗</span>
+              </a>
+            )}
+            {app.stores?.map((s) => (
+              <a class="btn btn-ghost" href={s.url} target="_blank" rel="noopener" data-magnetic data-hover>
+                {s.label} <span class="arrow">↗</span>
+              </a>
+            ))}
           </div>
         )
       }
-      <div>
-        <dt>Tính năng chính</dt>
-        <dd>
-          <ul>{app.features.map((f) => <li>{f}</li>)}</ul>
-        </dd>
-      </div>
-    </dl>
+    </div>
+
+    {
+      hasFacts && (
+        <dl class="facts">
+          {
+            app.platforms.length > 0 && (
+              <div>
+                <dt>Nền tảng</dt>
+                <dd>{app.platforms.join(" · ")}</dd>
+              </div>
+            )
+          }
+          {
+            app.url && (
+              <div>
+                <dt>Website</dt>
+                <dd><a href={app.url} target="_blank" rel="noopener" data-hover>{app.domain}</a></dd>
+              </div>
+            )
+          }
+          {
+            app.operator && (
+              <div>
+                <dt>Đơn vị cung cấp dịch vụ</dt>
+                <dd>{app.operator}</dd>
+              </div>
+            )
+          }
+          {
+            app.features.length > 0 && (
+              <div>
+                <dt>Tính năng chính</dt>
+                <dd>
+                  <ul>{app.features.map((f) => <li>{f}</li>)}</ul>
+                </dd>
+              </div>
+            )
+          }
+        </dl>
+      )
+    }
   </section>
 
   <nav class="container jump" aria-label="Mục trong trang">
@@ -116,8 +137,14 @@ const announcements = await getAnnouncements(app.slug);
           {policies.map((p, i) => (
             <li>
               <a class="policy" href={policyPath(p)} data-hover>
-                <span class="p-no">{String(i + 1).padStart(2, "0")}</span>
-                <h3>{p.data.title}</h3>
+                <span class="p-no">
+                  {String(i + 1).padStart(2, "0")}
+                  {p.data.draft && <span class="draft">Bản nháp</span>}
+                </span>
+                <h3>
+                  {p.data.title}
+                  {p.data.en && <span class="p-en" lang="en">{p.data.en.title}</span>}
+                </h3>
                 <p>{p.data.description}</p>
                 <span class="p-meta">
                   Cập nhật {formatDate(p.data.updated)} <span class="go" aria-hidden="true">→</span>
@@ -170,6 +197,9 @@ const announcements = await getAnnouncements(app.slug);
     margin-top: 4px;
     font-size: 13px;
     color: #7ee2a8;
+  }
+  .status:not(.live) {
+    color: var(--c2);
   }
   .status i {
     width: 7px;
@@ -375,9 +405,24 @@ const announcements = await getAnnouncements(app.slug);
     color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
+  .draft {
+    margin-left: 10px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid rgb(232 180 90 / 0.5);
+    color: var(--c2);
+    font-size: 11px;
+  }
   .policy h3 {
     font-size: 22px;
     letter-spacing: -0.02em;
+  }
+  .p-en {
+    display: block;
+    margin-top: 4px;
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--muted);
   }
   .policy p {
     color: var(--muted);

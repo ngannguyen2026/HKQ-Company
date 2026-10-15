@@ -3,7 +3,7 @@ import Base from "./Base.astro";
 import Header from "../components/Header.astro";
 import Footer from "../components/Footer.astro";
 import { company } from "../data/site";
-import { appPath, type App } from "../data/apps";
+import { appPath, isListed, type App } from "../data/apps";
 import "../styles/prose.css";
 
 interface Props {
@@ -13,9 +13,10 @@ interface Props {
   description?: string;
   /** Các cấp sau "Trang chủ / Sản phẩm / <tên sản phẩm>" */
   crumbs?: { label: string; href?: string }[];
+  noindex?: boolean;
 }
 
-const { app, title, description = app.description, crumbs = [] } = Astro.props;
+const { app, title, description = app.description, crumbs = [], noindex = false } = Astro.props;
 const pageTitle = title ? `${title} — ${app.name} | ${company.name}` : `${app.name} — ${app.tagline} | ${company.name}`;
 const trail = [
   { label: "Trang chủ", href: "/" },
@@ -25,7 +26,7 @@ const trail = [
 ];
 ---
 
-<Base title={pageTitle} description={description}>
+<Base title={pageTitle} description={description} noindex={noindex || !isListed(app)}>
   <Header />
 
   <main id="top" class="product-page" style={`--app-accent: ${app.accent}`}>

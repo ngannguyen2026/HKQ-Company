@@ -3,6 +3,7 @@ import { render } from "astro:content";
 import ProductLayout from "../../../../layouts/ProductLayout.astro";
 import { apps, appPath, type App } from "../../../../data/apps";
 import { getPolicies, policyPath, entrySlug, productOf, formatDate, type Policy } from "../../../../data/content";
+import { company } from "../../../../data/site";
 
 export async function getStaticPaths() {
   const policies = await getPolicies();
@@ -16,7 +17,21 @@ export async function getStaticPaths() {
 
 const { app, policy, siblings } = Astro.props as { app: App; policy: Policy; siblings: Policy[] };
 const { Content, headings } = await render(policy);
-const toc = headings.filter((h) => h.depth === 2);
+const { title, description, updated, en } = policy.data;
+// Mục lục: các "##", kèm các "###" lồng bên dưới nếu toc = 3
+const toc = headings
+  .filter((h) => h.depth === 2)
+  .map((h, k, all) => {
+    const start = headings.indexOf(h);
+    const end = k + 1 < all.length ? headings.indexOf(all[k + 1]) : headings.length;
+    return { ...h, children: policy.data.toc === 3 ? headings.slice(start + 1, end).filter((c) => c.depth === 3) : [] };
+  });
+const developer = app.operator ?? company.fullName;
+const developerEn = app.operatorEn ?? company.fullName;
+const isoDate = updated.toISOString().slice(0, 10);
+const dateEn = new Intl.DateTimeFormat("en-US", { dateStyle: "long", timeZone: "UTC" }).format(updated);
+// nhãn song ngữ khi trang có bản tiếng Anh
+const L = (vi: string, enLabel: string) => (en ? `${vi} / ${enLabel}` : vi);
 const i = siblings.findIndex((p) => p.id === policy.id);
 const pager = [
   { rel: "prev", label: "Chính sách trước", entry: siblings[i - 1] },
@@ -26,36 +41,89 @@ const pager = [
 
 <ProductLayout
   app={app}
-  title={policy.data.title}
-  description={policy.data.description}
-  crumbs={[{ label: "Chính sách", href: `${appPath(app.slug)}#chinh-sach` }, { label: policy.data.title }]}
+  title={en ? `${title} · ${en.title}` : title}
+  description={en ? `${description} ${en.description}` : description}
+  crumbs={[{ label: "Chính sách", href: `${appPath(app.slug)}#chinh-sach` }, { label: title }]}
+  noindex={policy.data.draft}
 >
   <div class="container doc">
+    {
+      policy.data.draft && (
+        <p class="draft-note" role="note">
+          <strong>Bản nháp</strong> — nội dung chính sách này đang được soạn thảo và chưa có hiệu lực.
+        </p>
+      )
+    }
     <header class="doc-head">
       <span class="label">Chính sách · {app.name}</span>
-      <h1>{policy.data.title}</h1>
-      <p class="lead">{policy.data.description}</p>
-      <p class="meta">
-        <span>Cập nhật lần cuối: <time datetime={policy.data.updated.toISOString().slice(0, 10)}>{formatDate(policy.data.updated)}</time></span>
-        {
-          policy.data.source && (
+      <h1>
+        {title}
+        {en && <span class="h1-en" lang="en">{en.title}</span>}
+      </h1>
+      <p class="lead">{description}</p>
+      {en && <p class="lead" lang="en">{en.description}</p>}
+
+      <dl class="facts">
+        <div>
+          <dt>{L("Ứng dụng", "App")}</dt>
+          <dd>{app.name}</dd>
+        </div>
+        <div>
+          <dt>{L("Nhà phát triển", "Developer")}</dt>
+          <dd>
+            {developer}
+            {en && developerEn !== developer && <span lang="en"> ({developerEn})</span>}
+          </dd>
+        </div>
+        <div>
+          <dt>{L("Cập nhật lần cuối", "Last updated")}</dt>
+          <dd>
+            <time datetime={isoDate}>{formatDate(updated)}</time>
+            {en && <span lang="en"> ({dateEn})</span>}
+          </dd>
+        </div>
+      </dl>
+
+      {
+        en && (
+          <nav class="langs" aria-label="Ngôn ngữ / Language">
+            {toc.map((h) => (
+              <a href={`#${h.slug}`} data-hover>
+                {h.text}
+              </a>
+            ))}
+          </nav>
+        )
+      }
+      {
+        policy.data.source && (
+          <p class="meta">
             <a href={policy.data.source} target="_blank" rel="noopener" data-hover>
               Bản công bố trên {new URL(policy.data.source).hostname} ↗
             </a>
-          )
-        }
-      </p>
+          </p>
+        )
+      }
     </header>
 
     <aside class="side">
       {
         toc.length > 1 && (
           <nav class="side-block" aria-label="Mục lục">
-            <p class="side-title">Trong chính sách này</p>
+            <p class="side-title">{L("Trong chính sách này", "Contents")}</p>
             <ol class="toc">
               {toc.map((h) => (
                 <li>
                   <a href={`#${h.slug}`} data-hover>{h.text}</a>
+                  {h.children.length > 0 && (
+                    <ol class="toc-sub">
+                      {h.children.map((c) => (
+                        <li>
+                          <a href={`#${c.slug}`} data-hover>{c.text}</a>
+                        </li>
+                      ))}
+                    </ol>
+                  )}
                 </li>
               ))}
             </ol>
@@ -102,12 +170,25 @@ const pager = [
     display: grid;
     grid-template-columns: minmax(0, 1fr) 280px;
     grid-template-areas:
+      "note note"
       "head head"
       "body side"
       "pager side";
     column-gap: clamp(40px, 6vw, 96px);
     padding-top: clamp(40px, 6vw, 64px);
     padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .draft-note {
+    grid-area: note;
+    margin-bottom: 32px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 1px solid rgb(232 180 90 / 0.45);
+    background: rgb(232 180 90 / 0.08);
+    font-size: 15px;
+  }
+  .draft-note strong {
+    color: var(--c2);
   }
   .doc-head {
     grid-area: head;
@@ -127,6 +208,54 @@ const pager = [
     font-size: 18px;
     color: var(--muted);
   }
+  .h1-en {
+    display: block;
+    margin-top: 0.15em;
+    font-size: 0.55em;
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--muted);
+  }
+  .lead + .lead {
+    margin-top: 8px;
+  }
+  .facts {
+    margin: 28px 0 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px 40px;
+  }
+  .facts dt {
+    font-size: 12px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .facts dd {
+    margin: 4px 0 0;
+    font-size: 15px;
+  }
+  .facts dd span {
+    color: var(--muted);
+  }
+  .langs {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .langs a {
+    padding: 8px 16px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.3s, color 0.3s;
+  }
+  .langs a:hover {
+    background: var(--text);
+    color: #0a0a0a;
+  }
   .meta {
     margin-top: 24px;
     display: flex;
@@ -134,9 +263,6 @@ const pager = [
     gap: 8px 24px;
     font-size: 14px;
     color: var(--muted);
-  }
-  .meta time {
-    color: var(--text);
   }
   .meta a {
     text-decoration: underline;
@@ -215,6 +341,17 @@ const pager = [
   .others a:hover {
     color: var(--text);
   }
+  .toc-sub {
+    list-style: none;
+    margin: 2px 0 8px;
+    padding: 0 0 0 14px;
+    border-left: 1px solid var(--border);
+    font-size: 13.5px;
+  }
+  .toc-sub a {
+    border-left: 0;
+    padding: 4px 0;
+  }
   .others a[aria-current] {
     color: var(--text);
     border-left-color: var(--app-accent);
@@ -224,14 +361,15 @@ const pager = [
   @media (max-width: 960px) {
     .doc {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: "head" "side" "body" "pager";
+      grid-template-areas: "note" "head" "side" "body" "pager";
     }
     .side {
       position: static;
       margin-bottom: 48px;
     }
     /* trên di động chỉ giữ mục lục; danh sách chính sách khác chuyển xuống cuối trang */
-    .side-block:last-child:not(:first-child) {
+    .side-block:last-child:not(:first-child),
+    .toc-sub {
       display: none;
     }
   }

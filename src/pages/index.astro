@@ -4,7 +4,7 @@ import Header from "../components/Header.astro";
 import AppShowcase from "../components/AppShowcase.astro";
 import Footer from "../components/Footer.astro";
 import { company, marquee, values, process, capabilities } from "../data/site";
-import { apps } from "../data/apps";
+import { apps, isListed } from "../data/apps";
 
 const trigrams = ["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"];
 ---
@@ -133,7 +133,7 @@ const trigrams = ["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"];
           </p>
         </div>
 
-        {apps.map((app, i) => <AppShowcase app={app} index={i} />)}
+        {apps.filter(isListed).map((app, i) => <AppShowcase app={app} index={i} />)}
 
         <div class="next" data-reveal>
           <div class="next-orb" aria-hidden="true"></div>
