@@ -1,0 +1,150 @@
+---
+import "../styles/global.css";
+import { company } from "../data/site";
+import { apps } from "../data/apps";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+
+const {
+  title = `${company.name} — ${company.tagline}`,
+  description = company.description,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL("/og.png", Astro.site);
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "Organization",
+  name: company.fullName,
+  ...(company.legalName && { legalName: company.legalName }),
+  url: Astro.site?.toString(),
+  logo: new URL("/favicon.svg", Astro.site).toString(),
+  email: company.email,
+  description: company.description,
+  ...(company.socials.length && { sameAs: company.socials.map((s) => s.url) }),
+  brand: apps.map((a) => ({ "@type": "Brand", name: a.name, url: a.url })),
+};
+---
+
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#07080b" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="vi_VN" />
+    <meta property="og:site_name" content={company.fullName} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@1,400;1,500;1,600&display=swap"
+      rel="stylesheet"
+    />
+    <script is:inline>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) {
+        document.documentElement.classList.add("js");
+        // màn chờ chỉ hiện ở lần mở đầu tiên trong phiên
+        try {
+          if (sessionStorage.getItem("bhq-intro")) document.documentElement.classList.add("intro-seen");
+          sessionStorage.setItem("bhq-intro", "1");
+        } catch (e) {}
+      }
+    </script>
+  </head>
+  <body>
+    <a href="#noi-dung" class="skip-link">Bỏ qua, đến nội dung chính</a>
+    <div class="preloader" aria-hidden="true">
+      <div class="preloader-inner">
+        <div class="preloader-logo">{company.name.split(" ").map((w) => <span>{w}</span>)}</div>
+        <div class="preloader-count"><span data-preload-count>0</span>%</div>
+      </div>
+      <div class="preloader-bar"><span></span></div>
+    </div>
+
+    <div class="progress" aria-hidden="true"></div>
+    <div class="cursor" aria-hidden="true"></div>
+    <div class="cursor-dot" aria-hidden="true"></div>
+
+    <slot />
+
+    <script>
+      import "../scripts/motion";
+    </script>
+  </body>
+</html>
+
+<style>
+  .preloader {
+    display: none;
+  }
+  :global(.js:not(.intro-seen)) .preloader {
+    display: grid;
+    place-items: center;
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    background: #050608;
+  }
+  .preloader-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+  .preloader-logo {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0 0.25em;
+    overflow: hidden;
+    padding: 0.15em 16px 0;
+    font-size: clamp(48px, 10vw, 128px);
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1.15;
+  }
+  .preloader-logo span {
+    display: inline-block;
+    transform: translateY(110%);
+  }
+  .preloader-count {
+    font-size: 14px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.1em;
+  }
+  .preloader-bar {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: rgb(255 255 255 / 0.06);
+  }
+  .preloader-bar span {
+    display: block;
+    height: 100%;
+    background: var(--grad);
+    transform-origin: 0 50%;
+    transform: scaleX(0);
+  }
+</style>
