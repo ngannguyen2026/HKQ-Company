@@ -1,0 +1,103 @@
+---
+import Base from "./Base.astro";
+import Header from "../components/Header.astro";
+import Footer from "../components/Footer.astro";
+import { company } from "../data/site";
+import { appPath, type App } from "../data/apps";
+import "../styles/prose.css";
+
+interface Props {
+  app: App;
+  /** Tiêu đề trang (không gồm tên sản phẩm/công ty) — bỏ trống ở trang tổng quan sản phẩm */
+  title?: string;
+  description?: string;
+  /** Các cấp sau "Trang chủ / Sản phẩm / <tên sản phẩm>" */
+  crumbs?: { label: string; href?: string }[];
+}
+
+const { app, title, description = app.description, crumbs = [] } = Astro.props;
+const pageTitle = title ? `${title} — ${app.name} | ${company.name}` : `${app.name} — ${app.tagline} | ${company.name}`;
+const trail = [
+  { label: "Trang chủ", href: "/" },
+  { label: "Sản phẩm", href: "/#san-pham" },
+  { label: app.name, href: crumbs.length ? appPath(app.slug) : undefined },
+  ...crumbs,
+];
+---
+
+<Base title={pageTitle} description={description}>
+  <Header />
+
+  <main id="top" class="product-page" style={`--app-accent: ${app.accent}`}>
+    <span id="noi-dung" tabindex="-1"></span>
+    <div class="page-bg" aria-hidden="true"><div class="page-glow"></div></div>
+
+    <div class="container">
+      <nav class="crumbs" aria-label="Đường dẫn">
+        <ol>
+          {
+            trail.map((c) => (
+              <li>{c.href ? <a href={c.href} data-hover>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>
+            ))
+          }
+        </ol>
+      </nav>
+    </div>
+
+    <slot />
+  </main>
+
+  <Footer />
+</Base>
+
+<style>
+  .product-page {
+    position: relative;
+    padding-top: 112px;
+    min-height: 70vh;
+    isolation: isolate;
+  }
+  .page-bg {
+    position: absolute;
+    inset: 0 0 auto;
+    height: 720px;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  .page-glow {
+    position: absolute;
+    top: -360px;
+    right: -10%;
+    width: min(900px, 90vw);
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--app-accent) 45%, transparent), transparent 65%);
+    filter: blur(80px);
+    opacity: 0.55;
+  }
+  .crumbs ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 0;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .crumbs li + li::before {
+    content: "/";
+    margin: 0 10px;
+    color: var(--dim);
+  }
+  .crumbs a {
+    transition: color 0.3s;
+  }
+  .crumbs a:hover {
+    color: var(--text);
+  }
+  .crumbs [aria-current] {
+    color: var(--text);
+  }
+</style>

@@ -1,5 +1,5 @@
 ---
-import type { App } from "../data/apps";
+import { appPath, statusLabel, type App } from "../data/apps";
 
 interface Props {
   app: App;
@@ -9,7 +9,6 @@ interface Props {
 const { app, index } = Astro.props;
 // Quẻ minh hoạ trên màn hình điện thoại: true = hào dương (liền), false = hào âm (đứt)
 const lines = [true, false, true, true, false, true];
-const statusLabel = { live: "Đang hoạt động", beta: "Beta", "coming-soon": "Sắp ra mắt" }[app.status];
 ---
 
 <article class="showcase" style={`--app-accent: ${app.accent}`} data-showcase>
@@ -54,7 +53,7 @@ const statusLabel = { live: "Đang hoạt động", beta: "Beta", "coming-soon":
   <div class="info">
     <div class="meta" data-reveal>
       <span class="num">{String(index + 1).padStart(2, "0")}</span>
-      <span class="status"><i></i>{statusLabel}</span>
+      <span class="status"><i></i>{statusLabel[app.status]}</span>
     </div>
     <p class="category" data-reveal>{app.category}</p>
     <h3 class="name" data-split>{app.name}</h3>
@@ -72,9 +71,14 @@ const statusLabel = { live: "Đang hoạt động", beta: "Beta", "coming-soon":
       }
     </ul>
 
-    <a class="btn btn-primary visit" href={app.url} target="_blank" rel="noopener" data-magnetic data-hover data-reveal>
-      Truy cập {app.domain} <span class="arrow">↗</span>
-    </a>
+    <div class="actions" data-reveal>
+      <a class="btn btn-primary" href={appPath(app.slug)} data-magnetic data-hover>
+        Chính sách & thông báo <span class="arrow">→</span>
+      </a>
+      <a class="btn btn-ghost" href={app.url} target="_blank" rel="noopener" data-magnetic data-hover>
+        Truy cập {app.domain} <span class="arrow">↗</span>
+      </a>
+    </div>
   </div>
 </article>
 
@@ -310,6 +314,11 @@ const statusLabel = { live: "Đang hoạt động", beta: "Beta", "coming-soon":
   .f-no {
     font-size: 12px;
     color: var(--muted);
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
   }
   .features li.is-active .f-no {
     color: var(--app-accent);

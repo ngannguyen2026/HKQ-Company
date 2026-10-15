@@ -1,4 +1,4 @@
-// Danh sách ứng dụng do Bảo Hân Quân quản lý.
+// Danh sách ứng dụng do Bảo Hân Quân Company quản lý.
 // Thêm một ứng dụng mới = thêm một object vào mảng `apps`.
 export type App = {
   slug: string;
@@ -15,7 +15,20 @@ export type App = {
   /** Màu nhấn riêng của sản phẩm */
   accent: string;
   status: "live" | "beta" | "coming-soon";
+  /** Link tải ứng dụng trên các kho */
+  stores?: { label: string; url: string }[];
+  /** Pháp nhân trực tiếp cung cấp dịch vụ (nếu khác Bảo Hân Quân Company) */
+  operator?: string;
 };
+
+export const statusLabel: Record<App["status"], string> = {
+  live: "Đang hoạt động",
+  beta: "Beta",
+  "coming-soon": "Sắp ra mắt",
+};
+
+/** Trang riêng của sản phẩm trên bhqcompany.com */
+export const appPath = (slug: string) => `/san-pham/${slug}/`;
 
 export const apps: App[] = [
   {
@@ -37,5 +50,10 @@ export const apps: App[] = [
     mark: "☯",
     accent: "#b0472f",
     status: "live",
+    stores: [
+      { label: "App Store", url: "https://apps.apple.com/vn/app/thi%C3%AAn-minh-d%E1%BB%8Bch/id6745871721?l=vi" },
+      { label: "Google Play", url: "https://play.google.com/store/apps/details?id=com.thienminhdich.app&hl=vi" },
+    ],
+    operator: "Công ty TNHH Thiên Minh Dịch",
   },
 ];

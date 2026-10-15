@@ -2,6 +2,7 @@
 import Base from "../layouts/Base.astro";
 import Header from "../components/Header.astro";
 import AppShowcase from "../components/AppShowcase.astro";
+import Footer from "../components/Footer.astro";
 import { company, marquee, values, process, capabilities } from "../data/site";
 import { apps } from "../data/apps";
 
@@ -9,7 +10,7 @@ const trigrams = ["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"];
 ---
 
 <Base>
-  <Header />
+  <Header home />
 
   <main id="top">
     <span id="noi-dung" tabindex="-1"></span>
@@ -207,44 +208,7 @@ const trigrams = ["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"];
     </section>
   </main>
 
-  <!-- ============ FOOTER ============ -->
-  <footer class="footer">
-    <div class="container">
-      <div class="footer-top">
-        <div>
-          <p class="f-title">Sản phẩm</p>
-          <ul>{apps.map((a) => <li><a href={a.url} target="_blank" rel="noopener" data-hover>{a.name} ↗</a></li>)}</ul>
-        </div>
-        <div>
-          <p class="f-title">Liên hệ</p>
-          <ul>
-            <li><a href={`mailto:${company.email}`} data-hover>{company.email}</a></li>
-            <li>{company.address}</li>
-          </ul>
-        </div>
-        {company.socials.length > 0 && (
-          <div>
-            <p class="f-title">Theo dõi</p>
-            <ul>{company.socials.map((sc) => <li><a href={sc.url} target="_blank" rel="noopener" data-hover>{sc.label} ↗</a></li>)}</ul>
-          </div>
-        )}
-        <a href="#top" class="to-top" data-magnetic data-hover aria-label="Lên đầu trang">↑</a>
-      </div>
-      <div class="giant" aria-hidden="true" data-giant>
-        {company.name.split(" ").map((w) => <span>{w}</span>)}
-      </div>
-      <div class="footer-bottom">
-        <p>© {company.year} {company.legalName || company.fullName}. Bảo lưu mọi quyền.</p>
-        {(company.taxId || company.phone) && (
-          <p>
-            {company.taxId && <>MST: {company.taxId}</>}
-            {company.taxId && company.phone && " · "}
-            {company.phone && <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>}
-          </p>
-        )}
-      </div>
-    </div>
-  </footer>
+  <Footer />
 </Base>
 
 <style>
@@ -791,74 +755,6 @@ const trigrams = ["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"];
     font-size: clamp(18px, 2.4vw, 28px);
     font-weight: 600;
     letter-spacing: -0.02em;
-  }
-
-  /* ---------------- FOOTER ---------------- */
-  .footer {
-    padding: 80px 0 32px;
-    border-top: 1px solid var(--border);
-    overflow: hidden;
-  }
-  .footer-top {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 64px;
-    align-items: flex-start;
-  }
-  .f-title {
-    font-size: 13px;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 16px;
-  }
-  .footer ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-    display: grid;
-    gap: 8px;
-  }
-  .footer a:hover {
-    color: var(--c2);
-  }
-  .to-top {
-    margin-left: auto;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    border: 1px solid var(--border-strong);
-    font-size: 22px;
-  }
-  .giant {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 64px;
-    overflow: hidden;
-    gap: 0.22em;
-    font-size: min(12vw, 172px);
-    font-weight: 800;
-    letter-spacing: -0.05em;
-    line-height: 1.12;
-    padding-top: 0.1em;
-  }
-  .giant span {
-    display: inline-block;
-    background: linear-gradient(180deg, var(--text) 0%, rgb(255 255 255 / 0.05) 95%);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
-  }
-  .footer-bottom {
-    margin-top: 24px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-    justify-content: space-between;
-    color: var(--muted);
-    font-size: 14px;
   }
 
   /* ---------------- RESPONSIVE ---------------- */

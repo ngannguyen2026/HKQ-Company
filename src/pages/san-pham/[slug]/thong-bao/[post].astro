@@ -1,0 +1,149 @@
+---
+import { render } from "astro:content";
+import ProductLayout from "../../../../layouts/ProductLayout.astro";
+import { apps, appPath, type App } from "../../../../data/apps";
+import {
+  getAnnouncements,
+  announcementPath,
+  entrySlug,
+  productOf,
+  formatDate,
+  type Announcement,
+} from "../../../../data/content";
+
+export async function getStaticPaths() {
+  const posts = await getAnnouncements();
+  return posts.map((post) => {
+    const app = apps.find((a) => a.slug === productOf(post.id));
+    if (!app) throw new Error(`Thông báo "${post.id}" nằm trong thư mục không khớp sản phẩm nào trong src/data/apps.ts`);
+    const others = posts.filter((p) => productOf(p.id) === app.slug && p.id !== post.id).slice(0, 3);
+    return { params: { slug: app.slug, post: entrySlug(post.id) }, props: { app, post, others } };
+  });
+}
+
+const { app, post, others } = Astro.props as { app: App; post: Announcement; others: Announcement[] };
+const { Content } = await render(post);
+const back = `${appPath(app.slug)}#thong-bao`;
+---
+
+<ProductLayout
+  app={app}
+  title={post.data.title}
+  description={post.data.summary}
+  crumbs={[{ label: "Thông báo", href: back }, { label: post.data.title }]}
+>
+  <article class="container post">
+    <header class="post-head">
+      <p class="meta">
+        <span class="tag">{post.data.tag}</span>
+        <time datetime={post.data.date.toISOString().slice(0, 10)}>{formatDate(post.data.date)}</time>
+      </p>
+      <h1>{post.data.title}</h1>
+      <p class="lead">{post.data.summary}</p>
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+
+    <a class="back" href={back} data-hover>← Tất cả thông báo của {app.name}</a>
+  </article>
+
+  {
+    others.length > 0 && (
+      <section class="container more" aria-labelledby="more-title">
+        <h2 id="more-title">Thông báo khác</h2>
+        <ul>
+          {others.map((p) => (
+            <li>
+              <a href={announcementPath(p)} data-hover>
+                <time datetime={p.data.date.toISOString().slice(0, 10)}>{formatDate(p.data.date)}</time>
+                <span>{p.data.title}</span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</ProductLayout>
+
+<style>
+  .post > * {
+    max-width: 760px;
+  }
+  .post {
+    padding-top: clamp(40px, 6vw, 64px);
+    padding-bottom: clamp(64px, 8vw, 96px);
+  }
+  .post-head {
+    padding-bottom: 40px;
+    margin-bottom: 48px;
+    border-bottom: 1px solid var(--border);
+  }
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .tag {
+    padding: 3px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    font-size: 12px;
+  }
+  .post-head h1 {
+    margin-top: 20px;
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 800;
+    letter-spacing: -0.045em;
+  }
+  .lead {
+    margin-top: 20px;
+    font-size: 18px;
+    color: var(--muted);
+  }
+  .back {
+    display: inline-block;
+    margin-top: 56px;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+  .back:hover {
+    color: var(--text);
+  }
+  .more {
+    padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .more h2 {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .more ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    max-width: 760px;
+    border-top: 1px solid var(--border);
+  }
+  .more a {
+    display: flex;
+    gap: 24px;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .more time {
+    flex: none;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .more a:hover span {
+    color: color-mix(in srgb, var(--app-accent) 55%, #fff);
+  }
+</style>
