@@ -1,13 +1,14 @@
 import type { APIRoute } from "astro";
-import { apps, appPath } from "../data/apps";
-import { getPolicies, getAnnouncements, policyPath, announcementPath } from "../data/content";
+import { apps, appPath, isListed } from "../data/apps";
+import { getPolicies, getAnnouncements, policyPath, announcementPath, productOf } from "../data/content";
 
 export const GET: APIRoute = async ({ site }) => {
+  const listed = new Set(apps.filter(isListed).map((a) => a.slug));
   const pages = [
     "/",
-    ...apps.map((a) => appPath(a.slug)),
-    ...(await getPolicies()).map(policyPath),
-    ...(await getAnnouncements()).map(announcementPath),
+    ...[...listed].map(appPath),
+    ...(await getPolicies()).filter((p) => listed.has(productOf(p.id)) && !p.data.draft).map(policyPath),
+    ...(await getAnnouncements()).filter((a) => listed.has(productOf(a.id))).map(announcementPath),
   ];
   const urls = pages
     .map((p) => `  <url><loc>${new URL(p, site)}</loc></url>`)

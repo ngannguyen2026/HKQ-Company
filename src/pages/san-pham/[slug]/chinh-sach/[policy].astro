@@ -29,8 +29,16 @@ const pager = [
   title={policy.data.title}
   description={policy.data.description}
   crumbs={[{ label: "Chính sách", href: `${appPath(app.slug)}#chinh-sach` }, { label: policy.data.title }]}
+  noindex={policy.data.draft}
 >
   <div class="container doc">
+    {
+      policy.data.draft && (
+        <p class="draft-note" role="note">
+          <strong>Bản nháp</strong> — nội dung chính sách này đang được soạn thảo và chưa có hiệu lực.
+        </p>
+      )
+    }
     <header class="doc-head">
       <span class="label">Chính sách · {app.name}</span>
       <h1>{policy.data.title}</h1>
@@ -102,12 +110,25 @@ const pager = [
     display: grid;
     grid-template-columns: minmax(0, 1fr) 280px;
     grid-template-areas:
+      "note note"
       "head head"
       "body side"
       "pager side";
     column-gap: clamp(40px, 6vw, 96px);
     padding-top: clamp(40px, 6vw, 64px);
     padding-bottom: clamp(96px, 12vw, 160px);
+  }
+  .draft-note {
+    grid-area: note;
+    margin-bottom: 32px;
+    padding: 14px 20px;
+    border-radius: 14px;
+    border: 1px solid rgb(232 180 90 / 0.45);
+    background: rgb(232 180 90 / 0.08);
+    font-size: 15px;
+  }
+  .draft-note strong {
+    color: var(--c2);
   }
   .doc-head {
     grid-area: head;
@@ -224,7 +245,7 @@ const pager = [
   @media (max-width: 960px) {
     .doc {
       grid-template-columns: minmax(0, 1fr);
-      grid-template-areas: "head" "side" "body" "pager";
+      grid-template-areas: "note" "head" "side" "body" "pager";
     }
     .side {
       position: static;

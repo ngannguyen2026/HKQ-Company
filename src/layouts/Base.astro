@@ -1,16 +1,19 @@
 ---
 import "../styles/global.css";
 import { company } from "../data/site";
-import { apps } from "../data/apps";
+import { apps, isListed } from "../data/apps";
 
 interface Props {
   title?: string;
   description?: string;
+  /** Không cho công cụ tìm kiếm lập chỉ mục (trang nháp / chưa công bố) */
+  noindex?: boolean;
 }
 
 const {
   title = `${company.name} — ${company.tagline}`,
   description = company.description,
+  noindex = false,
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site);
@@ -25,7 +28,7 @@ const jsonLd = {
   email: company.email,
   description: company.description,
   ...(company.socials.length && { sameAs: company.socials.map((s) => s.url) }),
-  brand: apps.map((a) => ({ "@type": "Brand", name: a.name, url: a.url })),
+  brand: apps.filter(isListed).map((a) => ({ "@type": "Brand", name: a.name, ...(a.url && { url: a.url }) })),
 };
 ---
 
@@ -37,6 +40,7 @@ const jsonLd = {
     <meta name="theme-color" content="#07080b" />
     <title>{title}</title>
     <meta name="description" content={description} />
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="canonical" href={canonical} />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="vi_VN" />

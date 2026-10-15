@@ -3,8 +3,9 @@
 export type App = {
   slug: string;
   name: string;
-  url: string;
-  domain: string;
+  /** Website của sản phẩm (bỏ trống nếu không có, ví dụ game offline) */
+  url?: string;
+  domain?: string;
   category: string;
   tagline: string;
   description: string;
@@ -19,6 +20,11 @@ export type App = {
   stores?: { label: string; url: string }[];
   /** Pháp nhân trực tiếp cung cấp dịch vụ (nếu khác Bảo Hân Quân Company) */
   operator?: string;
+  /**
+   * false = chưa công bố: không hiện ở trang chủ, footer, sitemap; trang sản phẩm vẫn truy cập được
+   * bằng link (dùng khi cần URL chính sách để nộp lên kho ứng dụng trước ngày ra mắt).
+   */
+  listed?: boolean;
 };
 
 export const statusLabel: Record<App["status"], string> = {
@@ -26,6 +32,9 @@ export const statusLabel: Record<App["status"], string> = {
   beta: "Beta",
   "coming-soon": "Sắp ra mắt",
 };
+
+/** Sản phẩm đã công bố (hiện ở trang chủ, footer, sitemap) */
+export const isListed = (app: App) => app.listed !== false;
 
 /** Trang riêng của sản phẩm trên bhqcompany.com */
 export const appPath = (slug: string) => `/san-pham/${slug}/`;
@@ -55,5 +64,19 @@ export const apps: App[] = [
       { label: "Google Play", url: "https://play.google.com/store/apps/details?id=com.thienminhdich.app&hl=vi" },
     ],
     operator: "Công ty TNHH Thiên Minh Dịch",
+  },
+  {
+    slug: "maze",
+    name: "Maze",
+    category: "Game · Offline",
+    // TODO: thay các nội dung giới thiệu bên dưới khi có thông tin chính thức
+    tagline: "Tìm đường ra khỏi mê cung.",
+    description: "Game giải mê cung chơi offline, không cần kết nối mạng.",
+    features: [],
+    platforms: [],
+    mark: "▦",
+    accent: "#3d7be0",
+    status: "coming-soon",
+    listed: false,
   },
 ];

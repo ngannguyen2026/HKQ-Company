@@ -16,6 +16,8 @@ const policies = defineCollection({
     order: z.number().default(100),
     /** Bản gốc công bố trên website của sản phẩm (nếu có) */
     source: z.url().optional(),
+    /** Bản nháp: hiện nhãn "Bản nháp" và không cho công cụ tìm kiếm lập chỉ mục */
+    draft: z.boolean().default(false),
   }),
 });
 

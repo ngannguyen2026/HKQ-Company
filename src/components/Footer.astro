@@ -1,6 +1,6 @@
 ---
 import { company } from "../data/site";
-import { apps, appPath } from "../data/apps";
+import { apps, appPath, isListed } from "../data/apps";
 ---
 
 <footer class="footer">
@@ -8,7 +8,7 @@ import { apps, appPath } from "../data/apps";
     <div class="footer-top">
       <div>
         <p class="f-title">Sản phẩm</p>
-        <ul>{apps.map((a) => <li><a href={appPath(a.slug)} data-hover>{a.name}</a></li>)}</ul>
+        <ul>{apps.filter(isListed).map((a) => <li><a href={appPath(a.slug)} data-hover>{a.name}</a></li>)}</ul>
       </div>
       <div>
         <p class="f-title">Liên hệ</p>

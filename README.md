@@ -36,6 +36,13 @@ Mỗi sản phẩm trong `src/data/apps.ts` tự có các trang:
 
 Tên thư mục trong `src/content/` phải trùng `slug` của sản phẩm (ví dụ `thien-minh-dich`).
 
+### Sản phẩm chưa công bố
+
+Đặt `listed: false` trong `src/data/apps.ts`: sản phẩm không hiện ở trang chủ, footer và sitemap, nhưng
+trang `/san-pham/<slug>/` và các trang chính sách vẫn truy cập được bằng link (có `noindex`). Dùng khi cần URL
+chính sách để nộp lên App Store / Google Play trước ngày ra mắt. Khi công bố: bỏ `listed: false` và thiết kế
+phần hình minh hoạ trong `src/components/AppShowcase.astro` (hiện đang dành riêng cho Thiên Minh Dịch).
+
 ### Thêm / sửa chính sách
 
 Tạo hoặc sửa file `src/content/policies/<slug>/<tên-chính-sách>.md`:
@@ -47,6 +54,7 @@ description: "Một câu tóm tắt, hiện trên thẻ chính sách và đầu 
 updated: 2026-07-31          # ngày cập nhật lần cuối
 order: 2                     # thứ tự trong danh sách (nhỏ đứng trước)
 source: "https://..."        # tuỳ chọn: link bản gốc
+draft: true                  # tuỳ chọn: hiện nhãn "Bản nháp", không lập chỉ mục, không đưa vào sitemap
 ---
 
 ## 1. Phạm vi áp dụng
