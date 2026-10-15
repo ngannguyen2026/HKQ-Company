@@ -43,7 +43,7 @@ function initAnchors() {
       if (target === null) return;
       e.preventDefault();
       // khoảng chừa cho header cố định lấy từ scroll-margin-top của phần tử đích (Lenis tự tính)
-      if (lenis) lenis.scrollTo(target as any, { duration: 1.6 });
+      if (lenis) lenis.scrollTo(target as any, { duration: 1 });
       else if (target === 0) scrollTo({ top: 0, behavior: "smooth" });
       else (target as HTMLElement).scrollIntoView({ behavior: "smooth" });
     });
@@ -68,7 +68,8 @@ function initHeader() {
 /* Smooth scroll                                                       */
 /* ------------------------------------------------------------------ */
 function initLenis() {
-  lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
+  // lerp: trang bám theo con lăn và dừng sau ~0.4s (kiểu duration 1.2s cũ khiến mỗi cú lăn trôi ~1s, cảm giác ì)
+  lenis = new Lenis({ lerp: 0.14 });
   lenis.on("scroll", ScrollTrigger.update);
   gsap.ticker.add((t) => lenis!.raf(t * 1000));
   gsap.ticker.lagSmoothing(0);
@@ -358,6 +359,8 @@ function initShowcase() {
     // nhẹ nhàng lơ lửng
     gsap.to(phone, { yPercent: -3, duration: 3, ease: "sine.inOut", yoyo: true, repeat: -1 });
 
+    // quãng cuộn giữ khối sản phẩm đứng yên để sáng lần lượt từng tính năng (mỗi tính năng 15% chiều cao màn hình)
+    const pinLength = `+=${features.length * 15}%`;
     const mm = gsap.matchMedia();
     mm.add("(min-width: 901px)", () => {
       const setActive = (i: number) => features.forEach((f, k) => f.classList.toggle("is-active", k <= i));
@@ -365,7 +368,7 @@ function initShowcase() {
       ScrollTrigger.create({
         trigger: sc,
         start: "top top",
-        end: `+=${features.length * 45}%`,
+        end: pinLength,
         pin: true,
         scrub: true,
         // chia đoạn cuộn thành (n + 1) phần: phần đầu chưa sáng mục nào, sau đó sáng dần từng mục
@@ -375,7 +378,7 @@ function initShowcase() {
         rotateY: -14,
         rotateX: 6,
         ease: "none",
-        scrollTrigger: { trigger: sc, start: "top top", end: `+=${features.length * 45}%`, scrub: true },
+        scrollTrigger: { trigger: sc, start: "top top", end: pinLength, scrub: true },
       });
       return () => features.forEach((f) => f.classList.remove("is-active"));
     });
