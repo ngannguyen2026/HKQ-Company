@@ -1,0 +1,906 @@
+---
+import Base from "../layouts/Base.astro";
+import Header from "../components/Header.astro";
+import AppShowcase from "../components/AppShowcase.astro";
+import { company, marquee, values, process, capabilities } from "../data/site";
+import { apps } from "../data/apps";
+
+const trigrams = ["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"];
+---
+
+<Base>
+  <Header />
+
+  <main id="top">
+    <span id="noi-dung" tabindex="-1"></span>
+    <!-- ============ HERO ============ -->
+    <section class="hero" data-hero>
+      <div class="hero-bg" aria-hidden="true">
+        <div class="aurora a1"></div>
+        <div class="aurora a2"></div>
+        <div class="aurora a3"></div>
+        <div class="grid-lines"></div>
+        <div class="spotlight" data-spotlight></div>
+      </div>
+
+      <div class="bagua" aria-hidden="true" data-bagua>
+        {trigrams.map((t, i) => <span style={`--i:${i}`}>{t}</span>)}
+      </div>
+
+      <div class="container hero-content" data-hero-content>
+        <span class="label" data-hero-fade>{company.fullName} · Studio sản phẩm số</span>
+
+        <h1 class="hero-title">
+          <span class="line-mask"><span class="hero-line">Xây dựng</span></span>
+          <span class="line-mask"><span class="hero-line">sản phẩm số</span></span>
+          <span class="line-mask">
+            <span class="hero-line">mang giá trị <span class="serif grad-text">Việt.</span></span>
+          </span>
+        </h1>
+
+        <div class="hero-bottom">
+          <p class="hero-lead" data-hero-fade>{company.description}</p>
+          <div class="hero-cta" data-hero-fade>
+            <a class="btn btn-primary" href="#san-pham" data-magnetic data-hover>
+              Khám phá sản phẩm <span class="arrow">↘</span>
+            </a>
+            <a class="btn btn-ghost" href="#lien-he" data-magnetic data-hover>Liên hệ hợp tác</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="scroll-hint" data-hero-fade aria-hidden="true">
+        <span>Cuộn xuống</span>
+        <i></i>
+      </div>
+    </section>
+
+    <!-- ============ MARQUEE ============ -->
+    <section class="marquee" aria-hidden="true">
+      <div class="marquee-row" data-marquee="-1">
+        {
+          [...marquee, ...marquee, ...marquee].map((m) => (
+            <span class="m-item">
+              {m}
+              <i>✦</i>
+            </span>
+          ))
+        }
+      </div>
+      <div class="marquee-row outline" data-marquee="1">
+        {
+          [...marquee, ...marquee, ...marquee].reverse().map((m) => (
+            <span class="m-item">
+              {m}
+              <i>✦</i>
+            </span>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- ============ ABOUT ============ -->
+    <section id="gioi-thieu" class="section about">
+      <div class="container">
+        <span class="label" data-reveal>Về chúng tôi</span>
+        <p class="about-text" data-scrub-words>
+          {company.name} là một studio sản phẩm. Chúng tôi tự lên ý tưởng, thiết kế, phát triển và vận hành
+          từng ứng dụng — mỗi sản phẩm một thương hiệu riêng, cùng chung một cam kết: chất lượng, tin cậy
+          và giá trị lâu dài cho người dùng Việt.
+        </p>
+
+      </div>
+    </section>
+
+    <!-- ============ CAPABILITIES ============ -->
+    <section id="nang-luc" class="section capabilities">
+      <div class="container">
+        <div class="cap-head">
+          <span class="label" data-reveal>Năng lực</span>
+          <h2 class="h-lg" data-split>Làm chủ toàn bộ <span class="serif grad-text">vòng đời sản phẩm</span></h2>
+        </div>
+        <ol class="cap-list">
+          {
+            capabilities.map((c, i) => (
+              <li class="cap-row" data-cap>
+                <span class="cap-line" aria-hidden="true" />
+                <span class="cap-no">0{i + 1}</span>
+                <h3 class="cap-title">{c.title}</h3>
+                <div class="cap-body">
+                  <p>{c.text}</p>
+                  <ul class="cap-tags">
+                    {c.tags.map((t) => <li>{t}</li>)}
+                  </ul>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ PRODUCTS ============ -->
+    <section id="san-pham" class="section products">
+      <div class="container">
+        <div class="section-head">
+          <span class="label" data-reveal>Sản phẩm</span>
+          <h2 class="h-xl" data-split>
+            Hệ sinh thái <span class="serif grad-text">ứng dụng</span>
+          </h2>
+          <p class="section-lead" data-reveal>
+            Mỗi sản phẩm là một thương hiệu độc lập, được {company.name} phát triển và chăm sóc trực tiếp.
+          </p>
+        </div>
+
+        {apps.map((app, i) => <AppShowcase app={app} index={i} />)}
+
+        <div class="next" data-reveal>
+          <div class="next-orb" aria-hidden="true"></div>
+          <span class="label">Đang ấp ủ</span>
+          <h3 class="h-lg">Sản phẩm tiếp theo<span class="grad-text">…</span></h3>
+          <p>Chúng tôi đang xây dựng thêm những ứng dụng mới. Hãy theo dõi {company.name} để cập nhật sớm nhất.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ VALUES ============ -->
+    <section id="gia-tri" class="section values">
+      <div class="container">
+        <div class="section-head">
+          <span class="label" data-reveal>Giá trị cốt lõi</span>
+          <h2 class="h-xl" data-split>Cách chúng tôi <span class="serif grad-text">làm sản phẩm</span></h2>
+        </div>
+
+        <div class="values-grid" data-cards>
+          {
+            values.map((v) => (
+              <article class="value-card" data-tilt data-card>
+                <div class="card-shine" />
+                <span class="v-no">{v.no}</span>
+                <h3>{v.title}</h3>
+                <p>{v.text}</p>
+              </article>
+            ))
+          }
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ PROCESS ============ -->
+    <section id="quy-trinh" class="section process">
+      <div class="container process-grid">
+        <div class="process-head">
+          <span class="label" data-reveal>Quy trình</span>
+          <h2 class="h-lg" data-split>Từ ý tưởng <br />đến <span class="serif grad-text">hàng ngày.</span></h2>
+        </div>
+
+        <ol class="timeline" data-timeline>
+          <div class="t-track" aria-hidden="true"><div class="t-fill" data-timeline-fill></div></div>
+          {
+            process.map((p, i) => (
+              <li class="t-step" data-step>
+                <span class="t-dot" />
+                <span class="t-no">0{i + 1}</span>
+                <h3>{p.title}</h3>
+                <p>{p.text}</p>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section id="lien-he" class="contact">
+      <div class="contact-bg" aria-hidden="true"><div class="aurora a1"></div><div class="aurora a3"></div></div>
+      <div class="container contact-inner">
+        <span class="label" data-reveal>Liên hệ</span>
+        <h2 class="contact-title" data-scrub-chars>Cùng nhau tạo nên điều có ích.</h2>
+        <p class="section-lead" data-reveal>
+          Hợp tác, đầu tư, quảng cáo hay góp ý sản phẩm — chúng tôi luôn sẵn lòng lắng nghe.
+        </p>
+        <a class="mail-btn" href={`mailto:${company.email}`} data-magnetic data-hover data-reveal>
+          <span class="mail-circle"><span class="arrow">↗</span></span>
+          <span class="mail-text">{company.email}</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ FOOTER ============ -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-top">
+        <div>
+          <p class="f-title">Sản phẩm</p>
+          <ul>{apps.map((a) => <li><a href={a.url} target="_blank" rel="noopener" data-hover>{a.name} ↗</a></li>)}</ul>
+        </div>
+        <div>
+          <p class="f-title">Liên hệ</p>
+          <ul>
+            <li><a href={`mailto:${company.email}`} data-hover>{company.email}</a></li>
+            <li>{company.address}</li>
+          </ul>
+        </div>
+        {company.socials.length > 0 && (
+          <div>
+            <p class="f-title">Theo dõi</p>
+            <ul>{company.socials.map((sc) => <li><a href={sc.url} target="_blank" rel="noopener" data-hover>{sc.label} ↗</a></li>)}</ul>
+          </div>
+        )}
+        <a href="#top" class="to-top" data-magnetic data-hover aria-label="Lên đầu trang">↑</a>
+      </div>
+      <div class="giant" aria-hidden="true" data-giant>
+        {company.name.split(" ").map((w) => <span>{w}</span>)}
+      </div>
+      <div class="footer-bottom">
+        <p>© {company.year} {company.legalName || company.fullName}. Bảo lưu mọi quyền.</p>
+        {(company.taxId || company.phone) && (
+          <p>
+            {company.taxId && <>MST: {company.taxId}</>}
+            {company.taxId && company.phone && " · "}
+            {company.phone && <a href={`tel:${company.phone.replace(/\s/g, "")}`}>{company.phone}</a>}
+          </p>
+        )}
+      </div>
+    </div>
+  </footer>
+</Base>
+
+<style>
+  /* ---------------- HERO ---------------- */
+  .hero {
+    position: relative;
+    min-height: 100svh;
+    display: flex;
+    align-items: flex-end;
+    padding: 140px 0 clamp(64px, 10vh, 120px);
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+  }
+  .aurora {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.55;
+    mix-blend-mode: screen;
+  }
+  .a1 {
+    width: 55vw;
+    height: 55vw;
+    top: -20%;
+    right: -10%;
+    background: radial-gradient(circle, var(--c1), transparent 65%);
+    animation: float1 18s ease-in-out infinite;
+  }
+  .a2 {
+    width: 45vw;
+    height: 45vw;
+    top: 20%;
+    left: -15%;
+    background: radial-gradient(circle, var(--c3), transparent 65%);
+    animation: float2 22s ease-in-out infinite;
+    opacity: 0.4;
+  }
+  .a3 {
+    width: 40vw;
+    height: 40vw;
+    bottom: -25%;
+    right: 20%;
+    background: radial-gradient(circle, var(--c2), transparent 65%);
+    animation: float3 20s ease-in-out infinite;
+    opacity: 0.4;
+  }
+  @keyframes float1 {
+    50% { transform: translate(-12vw, 10vh) scale(1.15); }
+  }
+  @keyframes float2 {
+    50% { transform: translate(14vw, -8vh) scale(0.9); }
+  }
+  @keyframes float3 {
+    50% { transform: translate(-10vw, -12vh) scale(1.2); }
+  }
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 80px 80px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 20%, transparent 75%);
+  }
+  .spotlight {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(600px circle at var(--mx, 50%) var(--my, 30%), rgb(255 255 255 / 0.07), transparent 60%);
+  }
+
+  .bagua {
+    position: absolute;
+    top: 50%;
+    right: -8vw;
+    width: min(70vw, 760px);
+    aspect-ratio: 1;
+    translate: 0 -50%;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    z-index: -1;
+    container-type: inline-size;
+  }
+  .bagua::before,
+  .bagua::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+  }
+  .bagua::before { inset: 14%; }
+  .bagua::after { inset: 30%; border-style: dashed; }
+  .bagua span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    translate: -50% -50%;
+    font-size: clamp(22px, 3vw, 40px);
+    color: rgb(255 255 255 / 0.18);
+    transform: rotate(calc(var(--i) * 45deg)) translateY(-43cqw);
+  }
+
+  .hero-content {
+    position: relative;
+  }
+  .hero-title {
+    margin-top: 28px;
+    font-size: clamp(48px, 10.5vw, 168px);
+    font-weight: 800;
+    line-height: 0.92;
+    letter-spacing: -0.055em;
+  }
+  .hero-title .serif {
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    padding-right: 0.08em;
+  }
+  .hero-line {
+    display: inline-block;
+  }
+  .hero-bottom {
+    margin-top: clamp(40px, 6vh, 72px);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 32px;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .hero-lead {
+    max-width: 480px;
+    color: var(--muted);
+    font-size: clamp(16px, 1.4vw, 18px);
+  }
+  .hero-cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .scroll-hint {
+    position: absolute;
+    left: 50%;
+    bottom: 24px;
+    translate: -50% 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .scroll-hint i {
+    width: 1px;
+    height: 40px;
+    background: linear-gradient(var(--text), transparent);
+    animation: drip 2s var(--ease) infinite;
+    transform-origin: top;
+  }
+  @keyframes drip {
+    0% { transform: scaleY(0); }
+    50% { transform: scaleY(1); transform-origin: top; }
+    51% { transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+
+  /* ---------------- MARQUEE ---------------- */
+  .marquee {
+    padding: 40px 0;
+    border-block: 1px solid var(--border);
+    overflow: hidden;
+    display: grid;
+    gap: 8px;
+  }
+  .marquee-row {
+    display: flex;
+    white-space: nowrap;
+    width: max-content;
+  }
+  .m-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 32px;
+    padding-right: 32px;
+    font-size: clamp(36px, 6vw, 88px);
+    font-weight: 700;
+    letter-spacing: -0.04em;
+    line-height: 1.1;
+  }
+  .m-item i {
+    font-style: normal;
+    font-size: 0.4em;
+    color: var(--c2);
+  }
+  .outline .m-item {
+    color: transparent;
+    -webkit-text-stroke: 1px rgb(255 255 255 / 0.3);
+  }
+
+  /* ---------------- ABOUT ---------------- */
+  .about-text {
+    margin-top: 32px;
+    font-size: clamp(28px, 4.2vw, 60px);
+    font-weight: 600;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+    max-width: 1100px;
+  }
+
+  /* ---------------- CAPABILITIES ---------------- */
+  .capabilities {
+    padding-top: 0;
+  }
+  .cap-head {
+    display: grid;
+    gap: 24px;
+    max-width: 900px;
+  }
+  .cap-list {
+    list-style: none;
+    margin: 72px 0 0;
+    padding: 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .cap-row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 80px minmax(0, 1fr) minmax(0, 1.1fr);
+    gap: 24px;
+    align-items: baseline;
+    padding: 40px 0;
+    isolation: isolate;
+  }
+  .cap-row::before {
+    content: "";
+    position: absolute;
+    inset: 0 calc(-1 * clamp(16px, 4vw, 40px));
+    z-index: -1;
+    background: linear-gradient(90deg, rgb(62 224 189 / 0.07), rgb(232 180 90 / 0.04), transparent);
+    opacity: 0;
+    transition: opacity 0.5s var(--ease);
+  }
+  .cap-row:hover::before {
+    opacity: 1;
+  }
+  .cap-line {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--border-strong);
+    transform-origin: 0 50%;
+  }
+  .cap-no {
+    font-size: 14px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+    transition: color 0.4s;
+  }
+  .cap-row:hover .cap-no {
+    color: var(--c2);
+  }
+  .cap-title {
+    font-size: clamp(28px, 3.4vw, 44px);
+    transition: translate 0.6s var(--ease);
+  }
+  .cap-row:hover .cap-title {
+    translate: 12px 0;
+  }
+  .cap-body p {
+    color: var(--muted);
+    font-size: 17px;
+    max-width: 480px;
+  }
+  .cap-tags {
+    list-style: none;
+    margin: 16px 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .cap-tags li {
+    font-size: 13px;
+    padding: 5px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+  }
+
+  /* ---------------- SECTION HEAD ---------------- */
+  .section-head {
+    max-width: 900px;
+  }
+  .section-head .h-xl,
+  .section-head .h-lg {
+    margin-top: 24px;
+  }
+  .section-lead {
+    margin-top: 24px;
+    max-width: 560px;
+    color: var(--muted);
+    font-size: 18px;
+  }
+
+  /* ---------------- PRODUCTS ---------------- */
+  .products {
+    background: linear-gradient(180deg, var(--bg), var(--bg-2) 20%, var(--bg-2) 80%, var(--bg));
+  }
+  .next {
+    position: relative;
+    overflow: hidden;
+    margin-top: 40px;
+    padding: clamp(32px, 6vw, 72px);
+    border-radius: var(--radius);
+    border: 1px dashed var(--border-strong);
+    display: grid;
+    gap: 16px;
+  }
+  .next p {
+    color: var(--muted);
+    max-width: 520px;
+  }
+  .next-orb {
+    position: absolute;
+    right: -10%;
+    top: -60%;
+    width: 50%;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: conic-gradient(from 0deg, var(--c1), var(--c2), var(--c3), var(--c1));
+    filter: blur(80px);
+    opacity: 0.25;
+    animation: spin 14s linear infinite;
+  }
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ---------------- VALUES ---------------- */
+  .values-grid {
+    margin-top: 72px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    perspective: 1200px;
+  }
+  .value-card {
+    position: relative;
+    overflow: hidden;
+    padding: 40px 32px;
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--radius);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transform-style: preserve-3d;
+    transition: border-color 0.4s;
+  }
+  .value-card:hover {
+    border-color: var(--border-strong);
+  }
+  .card-shine {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.4s;
+    background: radial-gradient(400px circle at var(--x, 50%) var(--y, 50%), rgb(62 224 189 / 0.14), transparent 50%);
+  }
+  .value-card:hover .card-shine {
+    opacity: 1;
+  }
+  .v-no {
+    font-size: 72px;
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1;
+    background: var(--grad);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    opacity: 0.9;
+  }
+  .value-card h3 {
+    margin-top: 72px;
+    font-size: 26px;
+    letter-spacing: -0.02em;
+  }
+  .value-card p {
+    margin-top: 14px;
+    color: var(--muted);
+  }
+
+  /* ---------------- PROCESS ---------------- */
+  .process-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+  }
+  .process-head {
+    position: sticky;
+    top: 140px;
+    align-self: start;
+  }
+  .process-head .h-lg {
+    margin-top: 24px;
+  }
+  .timeline {
+    position: relative;
+    list-style: none;
+    margin: 0;
+    padding: 0 0 0 48px;
+  }
+  .t-track {
+    position: absolute;
+    left: 7px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: var(--border);
+  }
+  .t-fill {
+    width: 100%;
+    height: 100%;
+    background: var(--grad);
+    background: linear-gradient(180deg, var(--c1), var(--c2), var(--c3));
+    transform-origin: top;
+    transform: scaleY(0);
+  }
+  .t-step {
+    position: relative;
+    padding: 0 0 clamp(64px, 10vw, 120px);
+    opacity: 0.25;
+    transition: opacity 0.6s var(--ease);
+  }
+  .t-step:last-child {
+    padding-bottom: 0;
+  }
+  .t-step.is-active {
+    opacity: 1;
+  }
+  .t-dot {
+    position: absolute;
+    left: -48px;
+    top: 4px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--dim);
+    transition: border-color 0.4s, box-shadow 0.4s, background 0.4s;
+  }
+  .t-step.is-active .t-dot {
+    border-color: var(--c2);
+    background: var(--c2);
+    box-shadow: 0 0 20px var(--c2);
+  }
+  .t-no {
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .t-step h3 {
+    margin-top: 8px;
+    font-size: clamp(32px, 4vw, 52px);
+  }
+  .t-step p {
+    margin-top: 12px;
+    color: var(--muted);
+    font-size: 18px;
+    max-width: 420px;
+  }
+
+  /* ---------------- CONTACT ---------------- */
+  .contact {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(120px, 18vw, 220px) 0;
+    border-top: 1px solid var(--border);
+  }
+  .contact-bg {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.6;
+  }
+  .contact-inner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+  .contact-title {
+    margin-top: 28px;
+    font-size: clamp(44px, 9vw, 140px);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1.05;
+    max-width: 1100px;
+  }
+  .contact .section-lead {
+    margin-inline: auto;
+  }
+  .mail-btn {
+    margin-top: 56px;
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+    padding: 10px 32px 10px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: rgb(255 255 255 / 0.03);
+    backdrop-filter: blur(10px);
+    transition: border-color 0.4s, background 0.4s;
+  }
+  .mail-btn:hover {
+    border-color: var(--c2);
+    background: rgb(255 255 255 / 0.06);
+  }
+  .mail-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background: var(--grad);
+    color: #000;
+    font-size: 24px;
+    font-weight: 700;
+  }
+  .mail-circle .arrow {
+    transition: transform 0.5s var(--ease);
+  }
+  .mail-btn:hover .mail-circle .arrow {
+    transform: rotate(45deg);
+  }
+  .mail-text {
+    font-size: clamp(18px, 2.4vw, 28px);
+    font-weight: 600;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---------------- FOOTER ---------------- */
+  .footer {
+    padding: 80px 0 32px;
+    border-top: 1px solid var(--border);
+    overflow: hidden;
+  }
+  .footer-top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 64px;
+    align-items: flex-start;
+  }
+  .f-title {
+    font-size: 13px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .footer ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+  }
+  .footer a:hover {
+    color: var(--c2);
+  }
+  .to-top {
+    margin-left: auto;
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    font-size: 22px;
+  }
+  .giant {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 64px;
+    overflow: hidden;
+    gap: 0.22em;
+    font-size: min(12vw, 172px);
+    font-weight: 800;
+    letter-spacing: -0.05em;
+    line-height: 1.12;
+    padding-top: 0.1em;
+  }
+  .giant span {
+    display: inline-block;
+    background: linear-gradient(180deg, var(--text) 0%, rgb(255 255 255 / 0.05) 95%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .footer-bottom {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: space-between;
+    color: var(--muted);
+    font-size: 14px;
+  }
+
+  /* ---------------- RESPONSIVE ---------------- */
+  @media (max-width: 900px) {
+    .cap-row {
+      grid-template-columns: 48px minmax(0, 1fr);
+      gap: 8px 16px;
+      padding: 32px 0;
+    }
+    .cap-body {
+      grid-column: 2;
+    }
+    .values-grid {
+      grid-template-columns: 1fr;
+    }
+    .value-card {
+      min-height: 280px;
+    }
+    .process-grid {
+      grid-template-columns: 1fr;
+    }
+    .process-head {
+      position: static;
+    }
+    .bagua {
+      right: -40vw;
+      width: 110vw;
+      opacity: 0.6;
+    }
+  }
+  @media (max-width: 640px) {
+    .mail-btn {
+      padding-right: 20px;
+      gap: 14px;
+    }
+    .mail-circle {
+      width: 48px;
+      height: 48px;
+      font-size: 18px;
+    }
+    .mail-text {
+      font-size: 15px;
+    }
+  }
+</style>

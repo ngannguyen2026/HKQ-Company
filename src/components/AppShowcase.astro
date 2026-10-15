@@ -1,0 +1,338 @@
+---
+import type { App } from "../data/apps";
+
+interface Props {
+  app: App;
+  index: number;
+}
+
+const { app, index } = Astro.props;
+// Quẻ minh hoạ trên màn hình điện thoại: true = hào dương (liền), false = hào âm (đứt)
+const lines = [true, false, true, true, false, true];
+const statusLabel = { live: "Đang hoạt động", beta: "Beta", "coming-soon": "Sắp ra mắt" }[app.status];
+---
+
+<article class="showcase" style={`--app-accent: ${app.accent}`} data-showcase>
+  <div class="visual">
+    <div class="glow" aria-hidden="true"></div>
+    <div class="ring" aria-hidden="true" data-ring>
+      {["☰", "☱", "☲", "☳", "☴", "☵", "☶", "☷"].map((t, i) => <span style={`--i:${i}`}>{t}</span>)}
+    </div>
+
+    <div class="phone" data-phone>
+      <div class="notch"></div>
+      <div class="screen">
+        <div class="app-top">
+          <span class="app-logo">{app.mark}</span>
+          <span>{app.name}</span>
+        </div>
+        <p class="app-hint">Một khoảng lặng để nhìn rõ điều đang nghĩ</p>
+        <div class="hexagram" data-hexagram>
+          {
+            lines.map((yang) => (
+              <div class={`hline ${yang ? "yang" : "yin"}`}>
+                <span />
+                {!yang && <span />}
+              </div>
+            ))
+          }
+        </div>
+        <p class="app-quote">“{app.tagline}”</p>
+        <div class="app-btn">Gieo quẻ</div>
+      </div>
+    </div>
+
+    {
+      app.platforms.map((p, i) => (
+        <span class={`chip chip-${i}`} data-chip data-speed={(i + 1) * 0.6}>
+          {p}
+        </span>
+      ))
+    }
+  </div>
+
+  <div class="info">
+    <div class="meta" data-reveal>
+      <span class="num">{String(index + 1).padStart(2, "0")}</span>
+      <span class="status"><i></i>{statusLabel}</span>
+    </div>
+    <p class="category" data-reveal>{app.category}</p>
+    <h3 class="name" data-split>{app.name}</h3>
+    <p class="tagline serif" data-reveal>“{app.tagline}”</p>
+    <p class="desc" data-reveal>{app.description}</p>
+
+    <ul class="features" data-features>
+      {
+        app.features.map((f, i) => (
+          <li data-feature>
+            <span class="f-no">0{i + 1}</span>
+            <span>{f}</span>
+          </li>
+        ))
+      }
+    </ul>
+
+    <a class="btn btn-primary visit" href={app.url} target="_blank" rel="noopener" data-magnetic data-hover data-reveal>
+      Truy cập {app.domain} <span class="arrow">↗</span>
+    </a>
+  </div>
+</article>
+
+<style>
+  .showcase {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(40px, 6vw, 96px);
+    align-items: center;
+    min-height: 100vh;
+    padding: 80px 0;
+  }
+
+  /* ---------- visual ---------- */
+  .visual {
+    position: relative;
+    aspect-ratio: 1;
+    container-type: inline-size;
+    display: grid;
+    place-items: center;
+  }
+  .glow {
+    position: absolute;
+    inset: 15%;
+    border-radius: 50%;
+    background: radial-gradient(circle, color-mix(in srgb, var(--app-accent) 55%, transparent), transparent 70%);
+    filter: blur(60px);
+    opacity: 0.7;
+  }
+  .ring {
+    position: absolute;
+    inset: 4%;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+  }
+  .ring::before {
+    content: "";
+    position: absolute;
+    inset: 12%;
+    border: 1px dashed var(--border);
+    border-radius: 50%;
+  }
+  .ring span {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: clamp(18px, 2.2vw, 28px);
+    color: var(--muted);
+    transform: rotate(calc(var(--i) * 45deg)) translateY(-46cqw) rotate(calc(var(--i) * -45deg));
+    translate: -50% -50%;
+  }
+
+  .phone {
+    position: relative;
+    width: min(56%, 300px);
+    aspect-ratio: 9 / 19;
+    border-radius: 44px;
+    padding: 10px;
+    background: linear-gradient(145deg, #2a2a2e, #0c0c0e);
+    box-shadow:
+      0 0 0 1px rgb(255 255 255 / 0.1),
+      0 40px 80px -20px rgb(0 0 0 / 0.8),
+      inset 0 0 0 1px rgb(255 255 255 / 0.06);
+  }
+  .notch {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    width: 30%;
+    height: 22px;
+    border-radius: 20px;
+    background: #000;
+    transform: translateX(-50%);
+    z-index: 2;
+  }
+  .screen {
+    height: 100%;
+    border-radius: 34px;
+    overflow: hidden;
+    padding: 56px 22px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    background:
+      radial-gradient(120% 60% at 50% 0%, color-mix(in srgb, var(--app-accent) 30%, transparent), transparent 70%),
+      linear-gradient(180deg, #1a1210, #0b0908);
+  }
+  .app-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+  .app-logo {
+    width: 26px;
+    height: 26px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    background: var(--app-accent);
+    font-size: 15px;
+  }
+  .app-hint {
+    margin-top: 10px;
+    font-size: 10px;
+    color: var(--muted);
+  }
+  .hexagram {
+    margin: auto 0;
+    width: 70%;
+    display: grid;
+    gap: 11px;
+  }
+  .hline {
+    display: flex;
+    gap: 14%;
+    height: 10px;
+  }
+  .hline span {
+    flex: 1;
+    border-radius: 3px;
+    background: linear-gradient(90deg, #f3d9a4, #e8b45a);
+    box-shadow: 0 0 14px rgb(232 180 90 / 0.4);
+    transform-origin: left center;
+  }
+  .app-quote {
+    font-family: "Playfair Display", serif;
+    font-style: italic;
+    font-size: 14px;
+    color: #f3d9a4;
+  }
+  .app-btn {
+    margin-top: 16px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 14px;
+    background: var(--app-accent);
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .chip {
+    position: absolute;
+    padding: 10px 18px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 500;
+    background: rgb(20 20 24 / 0.7);
+    border: 1px solid var(--border-strong);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  .chip-0 { top: 14%; left: 2%; }
+  .chip-1 { top: 48%; right: 0; }
+  .chip-2 { bottom: 12%; left: 8%; }
+
+  /* ---------- info ---------- */
+  .meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .num {
+    font-size: 14px;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    padding: 6px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    color: #7ee2a8;
+  }
+  .status i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #7ee2a8;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgb(126 226 168 / 0.6); }
+    70% { box-shadow: 0 0 0 10px rgb(126 226 168 / 0); }
+    100% { box-shadow: 0 0 0 0 rgb(126 226 168 / 0); }
+  }
+  .category {
+    margin-top: 28px;
+    color: var(--muted);
+    font-size: 15px;
+  }
+  .name {
+    margin-top: 8px;
+    font-size: clamp(44px, 6vw, 84px);
+  }
+  .tagline {
+    margin-top: 16px;
+    font-size: clamp(20px, 2.2vw, 28px);
+    color: var(--app-accent);
+    filter: brightness(1.4);
+  }
+  .desc {
+    margin-top: 20px;
+    color: var(--muted);
+    font-size: 17px;
+    max-width: 520px;
+  }
+  .features {
+    list-style: none;
+    margin: 32px 0 40px;
+    padding: 0;
+    border-top: 1px solid var(--border);
+  }
+  .features li {
+    display: flex;
+    gap: 20px;
+    align-items: baseline;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 17px;
+    color: var(--dim);
+    transition: color 0.5s var(--ease), padding 0.5s var(--ease);
+  }
+  .features li.is-active {
+    color: var(--text);
+    padding-left: 12px;
+  }
+  .f-no {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .features li.is-active .f-no {
+    color: var(--app-accent);
+    filter: brightness(1.4);
+  }
+
+  @media (max-width: 900px) {
+    .showcase {
+      grid-template-columns: 1fr;
+      min-height: auto;
+    }
+    .visual {
+      max-width: 520px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .features li {
+      color: var(--text);
+    }
+  }
+  @media (max-width: 560px) {
+    .ring span {
+      font-size: 16px;
+    }
+  }
+</style>
